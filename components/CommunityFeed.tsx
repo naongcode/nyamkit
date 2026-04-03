@@ -45,6 +45,7 @@ export default function CommunityFeed() {
   const [commentInputs, setCommentInputs] = useState<Record<string, typeof emptyComment>>({})
   const [deletingPost, setDeletingPost] = useState<Record<string, string>>({})
   const [deletingComment, setDeletingComment] = useState<Record<string, string>>({})
+  const [editingPost, setEditingPost] = useState<Record<string, { password: string; step: 'auth' | 'form'; form: typeof emptyWrite }>>({})
 
   const [ranking, setRanking] = useState<RankItem[]>([])
   const [rankPeriod, setRankPeriod] = useState<'week' | 'month'>('week')
@@ -161,6 +162,47 @@ export default function CommunityFeed() {
       const comment = await res.json()
       setPosts((ps) => ps.map((p) => p.id === postId ? { ...p, comments: [...p.comments, comment] } : p))
       setCommentInputs((ci) => ({ ...ci, [postId]: { ...input, text: '' } }))
+    }
+  }
+
+  function handleEditAuth(postId: string) {
+    const state = editingPost[postId]
+    if (!state || !state.password.trim()) return
+    const post = posts.find((p) => p.id === postId)
+    if (!post) return
+    setEditingPost((ep) => ({
+      ...ep,
+      [postId]: {
+        ...state,
+        step: 'form',
+        form: {
+          nickname: post.nickname,
+          password: state.password,
+          snack_name: post.snack_name,
+          short_desc: post.short_desc ?? '',
+          price_approx: post.price_approx ?? '',
+          purchase_url: post.purchase_url ?? '',
+          image_url: post.image_url ?? '',
+        },
+      },
+    }))
+  }
+
+  async function handleEditSubmit(postId: string) {
+    const state = editingPost[postId]
+    if (!state || state.step !== 'form') return
+    const res = await fetch(`/api/community/${postId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: state.password, ...state.form }),
+    })
+    if (res.ok) {
+      const updated = await res.json()
+      setPosts((ps) => ps.map((p) => p.id === postId ? { ...p, ...updated } : p))
+      setEditingPost((ep) => { const { [postId]: _, ...r } = ep; return r })
+    } else {
+      const { error } = await res.json()
+      alert(error ?? '수정에 실패했어요.')
     }
   }
 
@@ -327,7 +369,7 @@ export default function CommunityFeed() {
             return (
               <article key={post.id} className="bg-white border rounded-2xl overflow-hidden">
                 <div className="p-3 space-y-2">
-                  {/* 작성자 + 삭제 */}
+                  {/* 작성자 + 수정/삭제 */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-xs font-bold text-orange-500 shrink-0">
@@ -338,29 +380,78 @@ export default function CommunityFeed() {
                         <p className="text-xs text-gray-400">{timeAgo(post.created_at)}</p>
                       </div>
                     </div>
-                    {deletingPost[post.id] !== undefined ? (
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="password"
-                          placeholder="비밀번호"
-                          className="text-xs border rounded px-2 py-1 w-20 focus:outline-none focus:border-orange-400"
-                          value={deletingPost[post.id]}
-                          onChange={(e) => setDeletingPost((dp) => ({ ...dp, [post.id]: e.target.value }))}
-                          onKeyDown={(e) => { if (e.key === 'Enter') handleDeletePost(post.id) }}
-                          autoFocus
-                        />
-                        <button onClick={() => handleDeletePost(post.id)} className="text-xs text-red-500">확인</button>
-                        <button onClick={() => setDeletingPost((dp) => { const { [post.id]: _, ...r } = dp; return r })} className="text-xs text-gray-400">취소</button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeletingPost((dp) => ({ ...dp, [post.id]: '' }))}
-                        className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
-                      >
-                        삭제
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {deletingPost[post.id] !== undefined ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="password"
+                            placeholder="비밀번호"
+                            className="text-xs border rounded px-2 py-1 w-20 focus:outline-none focus:border-orange-400"
+                            value={deletingPost[post.id]}
+                            onChange={(e) => setDeletingPost((dp) => ({ ...dp, [post.id]: e.target.value }))}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleDeletePost(post.id) }}
+                            autoFocus
+                          />
+                          <button onClick={() => handleDeletePost(post.id)} className="text-xs text-red-500">확인</button>
+                          <button onClick={() => setDeletingPost((dp) => { const { [post.id]: _, ...r } = dp; return r })} className="text-xs text-gray-400">취소</button>
+                        </div>
+                      ) : !editingPost[post.id] && (
+                        <>
+                          <button
+                            onClick={() => setEditingPost((ep) => ({ ...ep, [post.id]: { password: '', step: 'auth', form: emptyWrite } }))}
+                            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => setDeletingPost((dp) => ({ ...dp, [post.id]: '' }))}
+                            className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
+                          >
+                            삭제
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {/* 수정 — 비밀번호 확인 */}
+                  {editingPost[post.id]?.step === 'auth' && (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <input
+                        type="password"
+                        placeholder="비밀번호 확인"
+                        className="text-xs border rounded px-2 py-1 w-28 focus:outline-none focus:border-orange-400"
+                        value={editingPost[post.id].password}
+                        onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], password: e.target.value } }))}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleEditAuth(post.id) }}
+                        autoFocus
+                      />
+                      <button onClick={() => handleEditAuth(post.id)} className="text-xs text-orange-500 font-semibold">확인</button>
+                      <button onClick={() => setEditingPost((ep) => { const { [post.id]: _, ...r } = ep; return r })} className="text-xs text-gray-400">취소</button>
+                    </div>
+                  )}
+
+                  {/* 수정 폼 */}
+                  {editingPost[post.id]?.step === 'form' && (
+                    <div className="border border-orange-200 rounded-xl p-3 space-y-2 bg-orange-50 mt-1">
+                      <input className={inputCls} placeholder="간식 이름 *" value={editingPost[post.id].form.snack_name}
+                        onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, snack_name: e.target.value } } }))} />
+                      <input className={inputCls} placeholder="한 줄 설명" value={editingPost[post.id].form.short_desc}
+                        onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, short_desc: e.target.value } } }))} />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input className={inputCls} placeholder="가격 (숫자만)" type="number" value={editingPost[post.id].form.price_approx}
+                          onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, price_approx: e.target.value.replace(/[^0-9]/g, '') } } }))} />
+                        <input className={inputCls} placeholder="구매링크 URL" value={editingPost[post.id].form.purchase_url}
+                          onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, purchase_url: e.target.value } } }))} />
+                      </div>
+                      <input className={inputCls} placeholder="이미지 URL" value={editingPost[post.id].form.image_url}
+                        onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, image_url: e.target.value } } }))} />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleEditSubmit(post.id)} className="flex-1 bg-orange-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors">저장</button>
+                        <button onClick={() => setEditingPost((ep) => { const { [post.id]: _, ...r } = ep; return r })} className="px-4 py-2 border rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* 간식 제목 + 가격 */}
                   <div className="flex items-start justify-between gap-2">
