@@ -194,7 +194,7 @@ export default function CommunityFeed() {
     const res = await fetch(`/api/community/${postId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: state.password, ...state.form }),
+      body: JSON.stringify({ ...state.form, password: state.password }),
     })
     if (res.ok) {
       const updated = await res.json()
