@@ -1,0 +1,270 @@
+[
+  {
+    "name": "파머스넷 호박고구마",
+    "short_desc": "고구마 크기가 큰 편",
+    "description": "잘 씻어서 에프돌리기",
+    "category": "기타",
+    "price_approx": "약 12,000원",
+    "volume": "5000",
+    "value_score": 5,
+    "prep_type": "에어프라이어",
+    "tags": [
+      "든든함"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/8729937079?itemId=25365374367",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/vendor_inventory/e17e/0a352fd91776d2c111e5fee8c968221e96381ad96c994b8217cca7b34c6b.jpeg",
+    "prep": {
+      "steps": [
+        "에프 180도 50분"
+      ],
+      "time_min": 50
+    },
+    "id": "snack_1775149409803",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "브레밀 미니 시나몬 스윌",
+    "short_desc": "시나몬 향 좋음",
+    "category": "냉동식품",
+    "price_approx": "약 9,200원",
+    "volume": "480g",
+    "value_score": 3,
+    "prep_type": "에어프라이어",
+    "tags": [],
+    "purchase_url": "https://www.coupang.com/vp/products/8369639059",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/rs_quotation_api/24gek8am/4c5fb6d4a0c44d7ea9c4acb2bb423737.jpg",
+    "prep": {
+      "steps": [
+        "180도 앞,뒤 8분씩"
+      ],
+      "time_min": 16
+    },
+    "id": "snack_1775149202783",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "Avieta 벨지안 펄슈가 와플",
+    "short_desc": "싼데 고급짐. 18개",
+    "description": "상온 2시간 해동 or 에프6분",
+    "category": "냉동식품",
+    "price_approx": "약 12,800원",
+    "volume": "990",
+    "value_score": 4,
+    "prep_type": "에어프라이어",
+    "tags": [
+      "주인장픽"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/8488897586",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/retail/images/34499816471221-d90c509b-b8b0-41f2-aa30-dd2b6cc87b96.jpg",
+    "prep": {
+      "steps": [
+        "180도 앞뒤로 3분씩"
+      ],
+      "time_min": 6
+    },
+    "id": "snack_1775148905761",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "떡편 단호박 카스테라 인절미",
+    "short_desc": "창억떡 게섯거라~",
+    "description": "살짝 차가운 상태로 먹어도 괜춘함",
+    "category": "냉동식품",
+    "price_approx": "약 9,490원",
+    "volume": "500g",
+    "value_score": 3,
+    "prep_type": "전자레인지",
+    "tags": [
+      "든든함",
+      "간단함"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/9236811261",
+    "image_url": "https://thumbnail4.coupangcdn.com/thumbnails/remote/212x212ex/image/rs_quotation_api/n04habqq/ba59eb6843804da4a3f438b53d589238.jpg",
+    "prep": {
+      "steps": [
+        "상온",
+        "또는 렌지1분"
+      ],
+      "time_min": 0
+    },
+    "id": "snack_1775148124010",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "비비고 단팥+슈크림 붕어빵",
+    "short_desc": "에프에 돌려야 맛있음",
+    "description": "렌지에 돌리면 좀 별로임",
+    "category": "기타",
+    "price_approx": "약 9,850원",
+    "volume": "600",
+    "value_score": 3,
+    "prep_type": "에어프라이어",
+    "tags": [],
+    "purchase_url": "https://www.coupang.com/vp/products/8288387283",
+    "image_url": "https://thumbnail11.coupangcdn.com/thumbnails/remote/212x212ex/image/vendor_inventory/dfbb/665f37302d0b60753a74629978afd61c274b84cf8a9c89f3a18870e188ec.jpg",
+    "prep": {
+      "steps": [
+        "에프 180도",
+        "앞면 5분, 뒷면5분"
+      ],
+      "time_min": 10
+    },
+    "id": "snack_1775147857594",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "삼립 버터롤",
+    "short_desc": "버터 + 설탕과 함께면 맛도리",
+    "category": "기타",
+    "price_approx": "약 3,980원",
+    "volume": "360g",
+    "value_score": 4,
+    "prep_type": "에어프라이어",
+    "tags": [],
+    "purchase_url": "https://www.coupang.com/vp/products/7170207053",
+    "image_url": "https://thumbnail6.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/1105372962853327-7fa1be97-d501-459a-ae0f-c04bced43594.jpg",
+    "prep": {
+      "steps": [
+        "에프 : 버터 바르고 170~175도 5분",
+        "후라이팬 : 버터 녹으면 설탕뿌리고 약불로 뒤집어가며 굽기"
+      ],
+      "time_min": 0
+    },
+    "id": "snack_1775147571547",
+    "created_at": "2026-04-02",
+    "recipe_links": [
+      {
+        "label": "지현쿡",
+        "url": "https://www.youtube.com/shorts/pv48dRwhcBw"
+      }
+    ],
+    "links": [
+      {
+        "label": "지현쿡",
+        "url": "https://www.youtube.com/shorts/pv48dRwhcBw",
+        "type": "recipe"
+      },
+      {
+        "label": "버터",
+        "url": "https://www.coupang.com/vp/products/206818868",
+        "type": "product"
+      },
+      {
+        "label": "설탕",
+        "url": "https://www.coupang.com/vp/products/6659187252",
+        "type": "product"
+      }
+    ]
+  },
+  {
+    "name": "풀무원 평양왕만두",
+    "short_desc": "밖에서 먹는만두 부럽지 않음",
+    "description": "렌지에 물붓고 5분 + 물버리고 1분",
+    "category": "냉동식품",
+    "price_approx": "약 12,980원",
+    "volume": "1400",
+    "value_score": 5,
+    "prep_type": "전자레인지",
+    "tags": [
+      "든든함"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/1278086708",
+    "image_url": "https://thumbnail10.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/1817796960064529-03528d8e-0e69-4296-bd16-f14da3e4c768.jpg",
+    "prep": {
+      "steps": [
+        "렌지용기에 만두가 잠길정도로 물붓고 ",
+        "5분 돌리고",
+        "물은 버리고 추가로 1분"
+      ],
+      "time_min": 6
+    },
+    "id": "snack_1775147180391",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "신라명과 마드레느",
+    "short_desc": "안달고 부드러움. ",
+    "description": "심심할때 까먹기 좋음. ",
+    "category": "기타",
+    "price_approx": "약 18,400원",
+    "volume": "600",
+    "value_score": 1,
+    "prep_type": "그냥먹기",
+    "tags": [
+      "간단함"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/1445397402",
+    "image_url": "https://thumbnail11.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/2020/04/09/15/0/db011d0c-cc92-4cd9-b86e-d59669755894.jpg",
+    "id": "snack_1775145786102",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "포르투갈 에그타르트",
+    "short_desc": "무난하게 맛있 12개",
+    "description": "전자레인지 2분\n에어프라이어 175도 10분",
+    "category": "기타",
+    "price_approx": "약 12,900원",
+    "volume": "720",
+    "value_score": 3,
+    "prep_type": "에어프라이어",
+    "tags": [
+      "간단함"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/5525821987",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/retail/images/1176858600349966-ffdea12d-c2d7-4ab7-b224-d57540fbe064.jpg",
+    "prep": {
+      "steps": [
+        "175도 10분"
+      ],
+      "time_min": 10
+    },
+    "id": "snack_1775145039005",
+    "created_at": "2026-04-02"
+  },
+  {
+    "name": "오뗄 핫도그",
+    "short_desc": "가성비 맛도리",
+    "category": "기타",
+    "price_approx": "약 12,250원",
+    "volume": "1250",
+    "value_score": 5,
+    "prep_type": "전자레인지",
+    "tags": [
+      "야식",
+      "주인장픽"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/279672753",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/230x230ex/image/retail/images/4393886090456954-d21807c5-8a6c-45c2-a0c3-be90a5aee817.jpg",
+    "id": "snack_1775143611679",
+    "created_at": "2026-04-02",
+    "description": "25개라 사놓으면 든든함\n밤에 출출할 때 1개 돌려먹으면됨.",
+    "prep": {
+      "steps": [
+        "렌지 1분30초~2분"
+      ],
+      "time_min": 0
+    }
+  },
+  {
+    "name": "커피콩 빵",
+    "short_desc": "커피향 굳. 강릉 안가도 됨",
+    "category": "냉동식품",
+    "price_approx": "약 9,900원",
+    "volume": "500g",
+    "value_score": 3,
+    "prep_type": "에어프라이어",
+    "tags": [
+      "주인장픽"
+    ],
+    "purchase_url": "https://www.coupang.com/vp/products/6252324051",
+    "image_url": "https://thumbnail12.coupangcdn.com/thumbnails/remote/212x212ex/image/retail/images/1727550769998-d52caf88-ab68-43d6-ba6f-0239a78a4a71.jpg",
+    "prep": {
+      "steps": [
+        "에프 180도 6분"
+      ],
+      "time_min": 6
+    },
+    "id": "snack_1775141827917",
+    "created_at": "2026-04-02"
+  }
+]

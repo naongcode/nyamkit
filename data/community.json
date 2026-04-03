@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1775174441666",
+    "nickname": "테스트",
+    "password": "13579",
+    "snack_name": "크림가득 만쥬",
+    "short_desc": "마시써요",
+    "price_approx": "11900",
+    "purchase_url": "https://www.coupang.com/vp/products/4588817244",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/retail/images/905854170895178-0f1bd59f-b2c2-41c9-bcda-3b9863487308.jpg",
+    "recommendations": 1,
+    "voter_ids": [
+      "6c931e4f-c2db-451e-b313-e84bacb3ae1b"
+    ],
+    "comments": [
+      {
+        "id": "1775174467447",
+        "nickname": "ㅁㄴㅇ",
+        "password": "13579",
+        "text": "이거 맛도리임",
+        "created_at": "2026-04-03T00:01:07.447Z"
+      }
+    ],
+    "created_at": "2026-04-03T00:00:41.666Z"
+  },
+  {
+    "id": "1775174785242",
+    "nickname": "테스트2",
+    "password": "1357",
+    "snack_name": "쫀득 초코칩쿠키",
+    "short_desc": "두쫀쿠 보다 나음",
+    "price_approx": "1620",
+    "purchase_url": "https://www.coupang.com/vp/products/7851918144",
+    "image_url": "https://thumbnail.coupangcdn.com/thumbnails/remote/657x657q90trim/image/retail/images/299720361104510-4e29e56c-da3c-4fd4-8b55-393bcf773ae2.jpg",
+    "recommendations": 1,
+    "voter_ids": [
+      "6c931e4f-c2db-451e-b313-e84bacb3ae1b"
+    ],
+    "comments": [
+      {
+        "id": "1775174797153",
+        "nickname": "ㅁㄴㅇ",
+        "password": "1231",
+        "text": "ㄹㅇ",
+        "created_at": "2026-04-03T00:06:37.153Z"
+      }
+    ],
+    "created_at": "2026-04-03T00:06:25.242Z"
+  }
+]
