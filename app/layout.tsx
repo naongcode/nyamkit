@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" data-theme="light" style={{ colorScheme: 'light' }}>
       <body className={`${geist.className} min-h-screen bg-orange-50`}>
         {children}
       </body>

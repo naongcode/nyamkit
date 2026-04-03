@@ -6,8 +6,14 @@ import ScrollRow from '@/components/ScrollRow'
 import { supabase } from '@/lib/supabase'
 
 async function getSnacks(): Promise<Snack[]> {
-  const { data } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })
-  return data || []
+  try {
+    const { data, error } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })
+    if (error) console.error('[getSnacks error]', error)
+    return data || []
+  } catch (e) {
+    console.error('[getSnacks exception]', e)
+    return []
+  }
 }
 
 export const dynamic = 'force-dynamic'
@@ -42,7 +48,7 @@ export default async function Home() {
         </div>
         <div className="flex items-center gap-2">
           <RandomButton snacks={snacks} />
-          <a href="/community" className="text-sm text-gray-500 border border-gray-300 px-3 py-2 rounded-full">커뮤니티</a>
+          <a href="/community" className="text-sm font-bold text-white bg-orange-500 px-4 py-2 rounded-full shadow-sm">냠스타 ⭐</a>
           <a href="/admin" className="text-sm text-gray-400 border border-gray-300 px-3 py-2 rounded-full">어드민</a>
         </div>
       </header>

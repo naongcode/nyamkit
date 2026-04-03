@@ -15,7 +15,7 @@ export default function RandomButton({ snacks }: { snacks: Snack[] }) {
   return (
     <button
       onClick={handleRandom}
-      className="bg-orange-500 text-white text-sm px-3 sm:px-4 py-2 rounded-full font-medium"
+      className="text-gray-500 border border-gray-300 text-sm px-3 sm:px-4 py-2 rounded-full font-medium"
     >
       <span className="sm:hidden">🎲</span>
       <span className="hidden sm:inline">오늘 뭐 먹지? 🎲</span>
