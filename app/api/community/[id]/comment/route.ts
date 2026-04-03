@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { readPosts, writePosts } from '../../route'
+import { supabase } from '@/lib/supabase'
 import { CommunityComment } from '@/types/community'
 
 export const dynamic = 'force-dynamic'
@@ -12,8 +12,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: '닉네임, 비밀번호, 내용은 필수예요.' }, { status: 400 })
   }
 
-  const posts = await readPosts()
-  const post = posts.find((p) => p.id === id)
+  const { data: post } = await supabase.from('community_posts').select('comments').eq('id', id).single()
   if (!post) return NextResponse.json({ error: '없는 글이에요.' }, { status: 404 })
 
   const comment: CommunityComment = {
@@ -23,8 +22,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     text: text.trim(),
     created_at: new Date().toISOString(),
   }
-  post.comments.push(comment)
-  await writePosts(posts)
+
+  await supabase
+    .from('community_posts')
+    .update({ comments: [...(post.comments || []), comment] })
+    .eq('id', id)
 
   const { password: _pw, ...publicComment } = comment
   return NextResponse.json(publicComment, { status: 201 })
@@ -34,16 +36,18 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const { id } = await params
   const { comment_id, password } = await req.json()
 
-  const posts = await readPosts()
-  const post = posts.find((p) => p.id === id)
+  const { data: post } = await supabase.from('community_posts').select('comments').eq('id', id).single()
   if (!post) return NextResponse.json({ error: '없는 글이에요.' }, { status: 404 })
 
-  const comment = post.comments.find((c) => c.id === comment_id)
+  const comments: CommunityComment[] = post.comments || []
+  const comment = comments.find((c) => c.id === comment_id)
   if (!comment) return NextResponse.json({ error: '없는 댓글이에요.' }, { status: 404 })
   if (comment.password !== password.trim()) return NextResponse.json({ error: '비밀번호가 틀렸어요.' }, { status: 403 })
 
-  post.comments = post.comments.filter((c) => c.id !== comment_id)
-  await writePosts(posts)
+  await supabase
+    .from('community_posts')
+    .update({ comments: comments.filter((c) => c.id !== comment_id) })
+    .eq('id', id)
 
   return NextResponse.json({ ok: true })
 }

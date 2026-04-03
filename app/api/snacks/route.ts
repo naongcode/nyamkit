@@ -1,56 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { supabase } from '@/lib/supabase'
 import { Snack } from '@/types/snack'
 
 export const dynamic = 'force-dynamic'
 
-const DATA_PATH = path.join(process.cwd(), 'data', 'snacks.json')
-
-async function readSnacks(): Promise<Snack[]> {
-  const raw = await fs.readFile(DATA_PATH, 'utf-8')
-  return JSON.parse(raw)
-}
-
-async function writeSnacks(snacks: Snack[]) {
-  await fs.writeFile(DATA_PATH, JSON.stringify(snacks, null, 2), 'utf-8')
-}
-
 export async function GET() {
-  const snacks = await readSnacks()
-  return NextResponse.json(snacks)
+  const { data, error } = await supabase
+    .from('snacks')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const snacks = await readSnacks()
-
   const newSnack: Snack = {
     ...body,
     id: `snack_${Date.now()}`,
     created_at: new Date().toISOString().split('T')[0],
   }
-
-  snacks.unshift(newSnack)
-  await writeSnacks(snacks)
-
-  return NextResponse.json(newSnack, { status: 201 })
+  const { data, error } = await supabase.from('snacks').insert(newSnack).select().single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data, { status: 201 })
 }
 
 export async function PUT(req: NextRequest) {
   const body = await req.json()
-  const snacks = await readSnacks()
-  const idx = snacks.findIndex((s) => s.id === body.id)
-  if (idx === -1) return NextResponse.json({ error: 'not found' }, { status: 404 })
-  snacks[idx] = { ...snacks[idx], ...body }
-  await writeSnacks(snacks)
-  return NextResponse.json(snacks[idx])
+  const { id, ...updates } = body
+  const { data, error } = await supabase.from('snacks').update(updates).eq('id', id).select().single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  return NextResponse.json(data)
 }
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json()
-  const snacks = await readSnacks()
-  const filtered = snacks.filter((s) => s.id !== id)
-  await writeSnacks(filtered)
+  const { error } = await supabase.from('snacks').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

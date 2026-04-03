@@ -1,14 +1,13 @@
-import { promises as fs } from 'fs'
-import path from 'path'
 import { Snack } from '@/types/snack'
 import SnackCard from '@/components/SnackCard'
 import SnackCardSmall from '@/components/SnackCardSmall'
 import RandomButton from '@/components/RandomButton'
 import ScrollRow from '@/components/ScrollRow'
+import { supabase } from '@/lib/supabase'
 
 async function getSnacks(): Promise<Snack[]> {
-  const file = await fs.readFile(path.join(process.cwd(), 'data', 'snacks.json'), 'utf-8')
-  return JSON.parse(file)
+  const { data } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })
+  return data || []
 }
 
 export const dynamic = 'force-dynamic'

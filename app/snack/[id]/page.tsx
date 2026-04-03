@@ -1,13 +1,11 @@
-import { promises as fs } from 'fs'
-import path from 'path'
 import { notFound } from 'next/navigation'
 import { Snack } from '@/types/snack'
 import ShareButton from '@/components/ShareButton'
+import { supabase } from '@/lib/supabase'
 
 async function getSnack(id: string): Promise<Snack | null> {
-  const file = await fs.readFile(path.join(process.cwd(), 'data', 'snacks.json'), 'utf-8')
-  const snacks: Snack[] = JSON.parse(file)
-  return snacks.find((s) => s.id === id) ?? null
+  const { data } = await supabase.from('snacks').select('*').eq('id', id).single()
+  return data || null
 }
 
 const PREP_EMOJI: Record<string, string> = {

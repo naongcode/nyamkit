@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { readPosts } from '../route'
+import { supabase } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,17 +7,17 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const period = searchParams.get('period') === 'month' ? 'month' : 'week'
 
-  const now = Date.now()
-  const cutoff = period === 'week' ? now - 7 * 24 * 60 * 60 * 1000 : now - 30 * 24 * 60 * 60 * 1000
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - (period === 'week' ? 7 : 30))
 
-  const posts = await readPosts()
-  const ranked = posts
-    .filter((p) => new Date(p.created_at).getTime() >= cutoff && p.recommendations > 0)
-    .sort((a, b) => b.recommendations - a.recommendations)
-    .slice(0, 5)
-    .map(({ id, snack_name, nickname, recommendations, image_url }) => ({
-      id, snack_name, nickname, recommendations, image_url,
-    }))
+  const { data, error } = await supabase
+    .from('community_posts')
+    .select('id, snack_name, nickname, recommendations, image_url')
+    .gte('created_at', cutoff.toISOString())
+    .gt('recommendations', 0)
+    .order('recommendations', { ascending: false })
+    .limit(5)
 
-  return NextResponse.json(ranked)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data || [])
 }
