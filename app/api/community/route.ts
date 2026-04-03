@@ -31,10 +31,10 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { nickname, password, snack_name, short_desc, price_approx, purchase_url, image_url } = await req.json()
+  const { nickname, password, snack_name, short_desc, items } = await req.json()
 
   if (!snack_name?.trim() || !nickname?.trim() || !password?.trim()) {
-    return NextResponse.json({ error: '닉네임, 비밀번호, 간식 이름은 필수예요.' }, { status: 400 })
+    return NextResponse.json({ error: '닉네임, 비밀번호, 글 제목은 필수예요.' }, { status: 400 })
   }
 
   const newPost = {
@@ -43,9 +43,7 @@ export async function POST(req: Request) {
     password: password.trim(),
     snack_name: snack_name.trim(),
     short_desc: short_desc?.trim() ?? '',
-    price_approx: price_approx?.trim() || null,
-    purchase_url: purchase_url?.trim() || null,
-    image_url: image_url?.trim() || null,
+    items: items ?? [],
     recommendations: 0,
     voter_ids: [],
     comments: [],

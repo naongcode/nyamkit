@@ -1,3 +1,10 @@
+export interface PostItem {
+  name: string
+  price_approx?: string
+  purchase_url?: string
+  image_url?: string
+}
+
 export interface CommunityComment {
   id: string
   nickname: string
@@ -15,6 +22,7 @@ export interface CommunityPost {
   price_approx?: string
   purchase_url?: string
   image_url?: string
+  items?: PostItem[]
   recommendations: number
   voter_ids: string[]
   comments: CommunityComment[]
@@ -37,6 +45,7 @@ export interface PublicPost {
   price_approx?: string
   purchase_url?: string
   image_url?: string
+  items?: PostItem[]
   recommendations: number
   comments: PublicComment[]
   created_at: string

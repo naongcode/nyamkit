@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { PublicPost } from '@/types/community'
+import { PublicPost, PostItem } from '@/types/community'
 
 function formatPrice(raw: string) {
   const num = Number(raw.replace(/[^0-9]/g, ''))
@@ -21,7 +21,8 @@ function timeAgo(iso: string) {
 
 interface RankItem { id: string; snack_name: string; nickname: string; recommendations: number; image_url?: string }
 
-const emptyWrite = { nickname: '', password: '', snack_name: '', short_desc: '', price_approx: '', purchase_url: '', image_url: '' }
+const emptyWrite = { nickname: '', password: '', snack_name: '', short_desc: '' }
+const emptyItem: PostItem = { name: '', price_approx: '', purchase_url: '', image_url: '' }
 const emptyComment = { nickname: '', password: '', text: '' }
 const inputCls = 'w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400'
 
@@ -39,13 +40,15 @@ export default function CommunityFeed() {
   const [votedPosts, setVotedPosts] = useState<Set<string>>(new Set())
   const [showForm, setShowForm] = useState(false)
   const [writeForm, setWriteForm] = useState(emptyWrite)
+  const [writeItems, setWriteItems] = useState<PostItem[]>([{ ...emptyItem }])
   const [submitting, setSubmitting] = useState(false)
   const [writeError, setWriteError] = useState('')
 
   const [commentInputs, setCommentInputs] = useState<Record<string, typeof emptyComment>>({})
   const [deletingPost, setDeletingPost] = useState<Record<string, string>>({})
   const [deletingComment, setDeletingComment] = useState<Record<string, string>>({})
-  const [editingPost, setEditingPost] = useState<Record<string, { password: string; step: 'auth' | 'form'; form: typeof emptyWrite }>>({})
+  const [editingPost, setEditingPost] = useState<Record<string, { password: string; step: 'auth' | 'form'; form: typeof emptyWrite; items: PostItem[] }>>({})
+  const [carouselIdx, setCarouselIdx] = useState<Record<string, number>>({})
 
   const [ranking, setRanking] = useState<RankItem[]>([])
   const [rankPeriod, setRankPeriod] = useState<'week' | 'month'>('week')
@@ -120,12 +123,13 @@ export default function CommunityFeed() {
     const res = await fetch('/api/community', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(writeForm),
+      body: JSON.stringify({ ...writeForm, items: writeItems.filter((it) => it.name.trim()) }),
     })
     if (res.ok) {
       const newPost = await res.json()
       setPosts((ps) => [newPost, ...ps])
       setWriteForm(emptyWrite)
+      setWriteItems([{ ...emptyItem }])
       setShowForm(false)
     } else {
       const { error } = await res.json()
@@ -170,20 +174,16 @@ export default function CommunityFeed() {
     if (!state || !state.password.trim()) return
     const post = posts.find((p) => p.id === postId)
     if (!post) return
+    const existingItems: PostItem[] = (post.items && post.items.length > 0)
+      ? post.items
+      : (post.image_url ? [{ name: post.snack_name, price_approx: post.price_approx ?? '', purchase_url: post.purchase_url ?? '', image_url: post.image_url ?? '' }] : [{ ...emptyItem }])
     setEditingPost((ep) => ({
       ...ep,
       [postId]: {
         ...state,
         step: 'form',
-        form: {
-          nickname: post.nickname,
-          password: state.password,
-          snack_name: post.snack_name,
-          short_desc: post.short_desc ?? '',
-          price_approx: post.price_approx ?? '',
-          purchase_url: post.purchase_url ?? '',
-          image_url: post.image_url ?? '',
-        },
+        form: { nickname: post.nickname, password: state.password, snack_name: post.snack_name, short_desc: post.short_desc ?? '' },
+        items: existingItems,
       },
     }))
   }
@@ -194,7 +194,7 @@ export default function CommunityFeed() {
     const res = await fetch(`/api/community/${postId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...state.form, password: state.password }),
+      body: JSON.stringify({ ...state.form, password: state.password, items: state.items.filter((it) => it.name.trim()) }),
     })
     if (res.ok) {
       const updated = await res.json()
@@ -313,24 +313,36 @@ export default function CommunityFeed() {
               <input className={inputCls} placeholder="닉네임 *" value={writeForm.nickname} onChange={(e) => setWriteForm((f) => ({ ...f, nickname: e.target.value }))} />
               <input className={inputCls} placeholder="비밀번호 *" type="password" value={writeForm.password} onChange={(e) => setWriteForm((f) => ({ ...f, password: e.target.value }))} />
             </div>
-            <input className={inputCls} placeholder="간식 이름 *" value={writeForm.snack_name} onChange={(e) => setWriteForm((f) => ({ ...f, snack_name: e.target.value }))} />
-            <input className={inputCls} placeholder="한 줄 설명 (예: 전자레인지 3분, 이거 진짜 맛있음)" value={writeForm.short_desc} onChange={(e) => setWriteForm((f) => ({ ...f, short_desc: e.target.value }))} />
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <input
-                  className={inputCls}
-                  placeholder="가격 (숫자만, 예: 11900)"
-                  type="number"
-                  value={writeForm.price_approx}
-                  onChange={(e) => setWriteForm((f) => ({ ...f, price_approx: e.target.value.replace(/[^0-9]/g, '') }))}
-                />
-                {writeForm.price_approx && (
-                  <p className="text-xs text-orange-500 mt-1">{formatPrice(writeForm.price_approx)}</p>
-                )}
-              </div>
-              <input className={inputCls} placeholder="구매링크 URL" value={writeForm.purchase_url} onChange={(e) => setWriteForm((f) => ({ ...f, purchase_url: e.target.value }))} />
+            <input className={inputCls} placeholder="글 제목 (예: 요즘 내 최애 간식 모음)" value={writeForm.snack_name} onChange={(e) => setWriteForm((f) => ({ ...f, snack_name: e.target.value }))} />
+            <input className={inputCls} placeholder="한 줄 설명 (선택)" value={writeForm.short_desc} onChange={(e) => setWriteForm((f) => ({ ...f, short_desc: e.target.value }))} />
+
+            {/* 제품 목록 */}
+            <div className="space-y-3">
+              {writeItems.map((item, i) => (
+                <div key={i} className="border border-gray-200 rounded-xl p-3 space-y-2 bg-white">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-500">제품 {i + 1}</span>
+                    {writeItems.length > 1 && (
+                      <button type="button" onClick={() => setWriteItems((its) => its.filter((_, j) => j !== i))} className="text-xs text-gray-400 hover:text-red-400">삭제</button>
+                    )}
+                  </div>
+                  <input className={inputCls} placeholder="제품명 *" value={item.name}
+                    onChange={(e) => setWriteItems((its) => its.map((it, j) => j === i ? { ...it, name: e.target.value } : it))} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input className={inputCls} placeholder="가격 (숫자만)" type="number" value={item.price_approx}
+                      onChange={(e) => setWriteItems((its) => its.map((it, j) => j === i ? { ...it, price_approx: e.target.value.replace(/[^0-9]/g, '') } : it))} />
+                    <input className={inputCls} placeholder="구매링크 URL" value={item.purchase_url}
+                      onChange={(e) => setWriteItems((its) => its.map((it, j) => j === i ? { ...it, purchase_url: e.target.value } : it))} />
+                  </div>
+                  <input className={inputCls} placeholder="이미지 URL (선택)" value={item.image_url}
+                    onChange={(e) => setWriteItems((its) => its.map((it, j) => j === i ? { ...it, image_url: e.target.value } : it))} />
+                </div>
+              ))}
+              <button type="button" onClick={() => setWriteItems((its) => [...its, { ...emptyItem }])}
+                className="w-full border border-dashed border-orange-300 text-orange-500 text-sm py-2 rounded-xl hover:bg-orange-50 transition-colors">
+                + 제품 추가
+              </button>
             </div>
-            <input className={inputCls} placeholder="이미지 URL (선택)" value={writeForm.image_url} onChange={(e) => setWriteForm((f) => ({ ...f, image_url: e.target.value }))} />
             {writeError && <p className="text-xs text-red-500">{writeError}</p>}
             <button
               onClick={handleSubmitPost}
@@ -398,7 +410,7 @@ export default function CommunityFeed() {
                       ) : !editingPost[post.id] && (
                         <>
                           <button
-                            onClick={() => setEditingPost((ep) => ({ ...ep, [post.id]: { password: '', step: 'auth', form: emptyWrite } }))}
+                            onClick={() => setEditingPost((ep) => ({ ...ep, [post.id]: { password: '', step: 'auth', form: emptyWrite, items: [] } }))}
                             className="text-xs text-gray-300 hover:text-gray-500 transition-colors"
                           >
                             수정
@@ -434,18 +446,34 @@ export default function CommunityFeed() {
                   {/* 수정 폼 */}
                   {editingPost[post.id]?.step === 'form' && (
                     <div className="border border-orange-200 rounded-xl p-3 space-y-2 bg-orange-50 mt-1">
-                      <input className={inputCls} placeholder="간식 이름 *" value={editingPost[post.id].form.snack_name}
+                      <input className={inputCls} placeholder="글 제목 *" value={editingPost[post.id].form.snack_name}
                         onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, snack_name: e.target.value } } }))} />
                       <input className={inputCls} placeholder="한 줄 설명" value={editingPost[post.id].form.short_desc}
                         onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, short_desc: e.target.value } } }))} />
-                      <div className="grid grid-cols-2 gap-2">
-                        <input className={inputCls} placeholder="가격 (숫자만)" type="number" value={editingPost[post.id].form.price_approx}
-                          onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, price_approx: e.target.value.replace(/[^0-9]/g, '') } } }))} />
-                        <input className={inputCls} placeholder="구매링크 URL" value={editingPost[post.id].form.purchase_url}
-                          onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, purchase_url: e.target.value } } }))} />
-                      </div>
-                      <input className={inputCls} placeholder="이미지 URL" value={editingPost[post.id].form.image_url}
-                        onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], form: { ...ep[post.id].form, image_url: e.target.value } } }))} />
+                      {editingPost[post.id].items.map((item, i) => (
+                        <div key={i} className="border border-gray-200 rounded-xl p-3 space-y-2 bg-white">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-500">제품 {i + 1}</span>
+                            {editingPost[post.id].items.length > 1 && (
+                              <button type="button" onClick={() => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: ep[post.id].items.filter((_, j) => j !== i) } }))} className="text-xs text-gray-400 hover:text-red-400">삭제</button>
+                            )}
+                          </div>
+                          <input className={inputCls} placeholder="제품명 *" value={item.name}
+                            onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: ep[post.id].items.map((it, j) => j === i ? { ...it, name: e.target.value } : it) } }))} />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input className={inputCls} placeholder="가격 (숫자만)" type="number" value={item.price_approx}
+                              onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: ep[post.id].items.map((it, j) => j === i ? { ...it, price_approx: e.target.value.replace(/[^0-9]/g, '') } : it) } }))} />
+                            <input className={inputCls} placeholder="구매링크 URL" value={item.purchase_url}
+                              onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: ep[post.id].items.map((it, j) => j === i ? { ...it, purchase_url: e.target.value } : it) } }))} />
+                          </div>
+                          <input className={inputCls} placeholder="이미지 URL" value={item.image_url}
+                            onChange={(e) => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: ep[post.id].items.map((it, j) => j === i ? { ...it, image_url: e.target.value } : it) } }))} />
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => setEditingPost((ep) => ({ ...ep, [post.id]: { ...ep[post.id], items: [...ep[post.id].items, { ...emptyItem }] } }))}
+                        className="w-full border border-dashed border-orange-300 text-orange-500 text-sm py-2 rounded-xl hover:bg-orange-50 transition-colors">
+                        + 제품 추가
+                      </button>
                       <div className="flex gap-2">
                         <button onClick={() => handleEditSubmit(post.id)} className="flex-1 bg-orange-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors">저장</button>
                         <button onClick={() => setEditingPost((ep) => { const { [post.id]: _, ...r } = ep; return r })} className="px-4 py-2 border rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
@@ -453,29 +481,61 @@ export default function CommunityFeed() {
                     </div>
                   )}
 
-                  {/* 간식 제목 + 가격 */}
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-bold text-base">{post.snack_name}</p>
-                    {(post.price_approx || post.purchase_url) && (
-                      <div className="text-right shrink-0">
-                        {post.price_approx && <p className="text-sm font-bold text-orange-500">{formatPrice(post.price_approx)}</p>}
-                        {post.purchase_url && (
-                          <a href={post.purchase_url} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-blue-500 underline underline-offset-2">구매링크 →</a>
-                        )}
+                  {/* 제목 + 설명 */}
+                  <p className="font-bold text-base">{post.snack_name}</p>
+                  {post.short_desc && <p className="text-sm text-gray-500">{post.short_desc}</p>}
+
+                  {/* 카루셀 — items 우선, 없으면 구 image_url 단일 표시 */}
+                  {(() => {
+                    const items = post.items && post.items.length > 0 ? post.items : (post.image_url ? [{ name: post.snack_name, price_approx: post.price_approx, purchase_url: post.purchase_url, image_url: post.image_url }] : [])
+                    if (items.length === 0) return null
+                    const idx = carouselIdx[post.id] ?? 0
+                    const setIdx = (n: number) => setCarouselIdx((ci) => ({ ...ci, [post.id]: Math.max(0, Math.min(items.length - 1, n)) }))
+                    return (
+                      <div className="space-y-1.5">
+                        <div className="relative rounded-xl overflow-hidden bg-gray-100">
+                          {/* 슬라이드 */}
+                          <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
+                            {items.map((item, i) => (
+                              <div key={i} className="min-w-full">
+                                {item.image_url
+                                  ? <img src={item.image_url} alt={item.name} className="w-full max-h-64 object-cover" />
+                                  : <div className="w-full h-32 flex items-center justify-center text-4xl">🍱</div>}
+                              </div>
+                            ))}
+                          </div>
+                          {/* 좌우 버튼 */}
+                          {items.length > 1 && (
+                            <>
+                              <button onClick={() => setIdx(idx - 1)} disabled={idx === 0}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">‹</button>
+                              <button onClick={() => setIdx(idx + 1)} disabled={idx === items.length - 1}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">›</button>
+                              {/* 닷 인디케이터 */}
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                                {items.map((_, i) => (
+                                  <button key={i} onClick={() => setIdx(i)}
+                                    className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? 'bg-white' : 'bg-white/40'}`} />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {/* 현재 아이템 정보 */}
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-semibold">{items[idx].name}</p>
+                          <div className="text-right shrink-0">
+                            {items[idx].price_approx && <p className="text-sm font-bold text-orange-500">{formatPrice(items[idx].price_approx!)}</p>}
+                            {items[idx].purchase_url && (
+                              <a href={items[idx].purchase_url} target="_blank" rel="noopener noreferrer"
+                                className="text-xs text-blue-500 underline underline-offset-2">구매링크 →</a>
+                            )}
+                          </div>
+                        </div>
+                        {items.length > 1 && <p className="text-xs text-gray-400">{idx + 1} / {items.length}</p>}
                       </div>
-                    )}
-                  </div>
-
-                  {/* 이미지 */}
-                  {post.image_url && (
-                    <div className="rounded-xl overflow-hidden bg-gray-100">
-                      <img src={post.image_url} alt={post.snack_name} className="w-full max-h-72 object-cover" />
-                    </div>
-                  )}
-
-                  {/* 한 줄 설명 */}
-                  {post.short_desc && <p className="text-sm text-gray-600">{post.short_desc}</p>}
+                    )
+                  })()}
 
                   {/* 추천 */}
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t">
