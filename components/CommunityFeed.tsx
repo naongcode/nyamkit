@@ -3,6 +3,75 @@
 import { useEffect, useRef, useState } from 'react'
 import { PublicPost, PostItem } from '@/types/community'
 
+function Carousel({ items }: { items: PostItem[] }) {
+  const [idx, setIdx] = useState(0)
+  const drag = useRef<{ startX: number; dragging: boolean }>({ startX: 0, dragging: false })
+
+  function goTo(n: number) {
+    setIdx(Math.max(0, Math.min(items.length - 1, n)))
+  }
+
+  function onDragStart(clientX: number) {
+    drag.current = { startX: clientX, dragging: true }
+  }
+
+  function onDragEnd(clientX: number) {
+    if (!drag.current.dragging) return
+    const diff = drag.current.startX - clientX
+    if (diff > 50) goTo(idx + 1)
+    else if (diff < -50) goTo(idx - 1)
+    drag.current.dragging = false
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <div
+        className="relative rounded-xl overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing"
+        onMouseDown={e => onDragStart(e.clientX)}
+        onMouseUp={e => onDragEnd(e.clientX)}
+        onMouseLeave={() => { drag.current.dragging = false }}
+        onTouchStart={e => onDragStart(e.touches[0].clientX)}
+        onTouchEnd={e => onDragEnd(e.changedTouches[0].clientX)}
+      >
+        <div className="flex transition-transform duration-300 ease-in-out select-none" style={{ transform: `translateX(-${idx * 100}%)` }}>
+          {items.map((item, i) => (
+            <div key={i} className="min-w-full">
+              {item.image_url
+                ? <img src={item.image_url} alt={item.name} className="w-full max-h-64 object-cover" draggable={false} />
+                : <div className="w-full h-32 flex items-center justify-center text-4xl">🍱</div>}
+            </div>
+          ))}
+        </div>
+        {items.length > 1 && (
+          <>
+            <button onClick={() => goTo(idx - 1)} disabled={idx === 0}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">‹</button>
+            <button onClick={() => goTo(idx + 1)} disabled={idx === items.length - 1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">›</button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {items.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? 'bg-white' : 'bg-white/40'}`} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm font-semibold">{items[idx].name}</p>
+        <div className="text-right shrink-0">
+          {items[idx].price_approx && <p className="text-sm font-bold text-orange-500">{formatPrice(items[idx].price_approx!)}</p>}
+          {items[idx].purchase_url && (
+            <a href={items[idx].purchase_url} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-blue-500 underline underline-offset-2">구매링크 →</a>
+          )}
+        </div>
+      </div>
+      {items.length > 1 && <p className="text-xs text-gray-400">{idx + 1} / {items.length}</p>}
+    </div>
+  )
+}
+
 function formatPrice(raw: string) {
   const num = Number(raw.replace(/[^0-9]/g, ''))
   if (!num) return raw
@@ -48,7 +117,6 @@ export default function CommunityFeed() {
   const [deletingPost, setDeletingPost] = useState<Record<string, string>>({})
   const [deletingComment, setDeletingComment] = useState<Record<string, string>>({})
   const [editingPost, setEditingPost] = useState<Record<string, { password: string; step: 'auth' | 'form'; form: typeof emptyWrite; items: PostItem[] }>>({})
-  const [carouselIdx, setCarouselIdx] = useState<Record<string, number>>({})
 
   const [ranking, setRanking] = useState<RankItem[]>([])
   const [rankPeriod, setRankPeriod] = useState<'week' | 'month'>('week')
@@ -489,52 +557,7 @@ export default function CommunityFeed() {
                   {(() => {
                     const items = post.items && post.items.length > 0 ? post.items : (post.image_url ? [{ name: post.snack_name, price_approx: post.price_approx, purchase_url: post.purchase_url, image_url: post.image_url }] : [])
                     if (items.length === 0) return null
-                    const idx = carouselIdx[post.id] ?? 0
-                    const setIdx = (n: number) => setCarouselIdx((ci) => ({ ...ci, [post.id]: Math.max(0, Math.min(items.length - 1, n)) }))
-                    return (
-                      <div className="space-y-1.5">
-                        <div className="relative rounded-xl overflow-hidden bg-gray-100">
-                          {/* 슬라이드 */}
-                          <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${idx * 100}%)` }}>
-                            {items.map((item, i) => (
-                              <div key={i} className="min-w-full">
-                                {item.image_url
-                                  ? <img src={item.image_url} alt={item.name} className="w-full max-h-64 object-cover" />
-                                  : <div className="w-full h-32 flex items-center justify-center text-4xl">🍱</div>}
-                              </div>
-                            ))}
-                          </div>
-                          {/* 좌우 버튼 */}
-                          {items.length > 1 && (
-                            <>
-                              <button onClick={() => setIdx(idx - 1)} disabled={idx === 0}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">‹</button>
-                              <button onClick={() => setIdx(idx + 1)} disabled={idx === items.length - 1}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white text-sm flex items-center justify-center disabled:opacity-20">›</button>
-                              {/* 닷 인디케이터 */}
-                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                                {items.map((_, i) => (
-                                  <button key={i} onClick={() => setIdx(i)}
-                                    className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? 'bg-white' : 'bg-white/40'}`} />
-                                ))}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        {/* 현재 아이템 정보 */}
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-semibold">{items[idx].name}</p>
-                          <div className="text-right shrink-0">
-                            {items[idx].price_approx && <p className="text-sm font-bold text-orange-500">{formatPrice(items[idx].price_approx!)}</p>}
-                            {items[idx].purchase_url && (
-                              <a href={items[idx].purchase_url} target="_blank" rel="noopener noreferrer"
-                                className="text-xs text-blue-500 underline underline-offset-2">구매링크 →</a>
-                            )}
-                          </div>
-                        </div>
-                        {items.length > 1 && <p className="text-xs text-gray-400">{idx + 1} / {items.length}</p>}
-                      </div>
-                    )
+                    return <Carousel items={items} />
                   })()}
 
                   {/* 추천 */}

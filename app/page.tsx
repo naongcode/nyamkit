@@ -5,6 +5,27 @@ import RandomButton from '@/components/RandomButton'
 import ScrollRow from '@/components/ScrollRow'
 import { supabase } from '@/lib/supabase'
 
+interface RankItem { id: string; snack_name: string; nickname: string; recommendations: number; image_url?: string }
+
+async function getWeeklyRanking(): Promise<RankItem[]> {
+  try {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - 7)
+    const { data, error } = await supabase
+      .from('community_posts')
+      .select('id, snack_name, nickname, recommendations, image_url')
+      .gte('created_at', cutoff.toISOString())
+      .gt('recommendations', 0)
+      .order('recommendations', { ascending: false })
+      .limit(5)
+    if (error) console.error('[getWeeklyRanking error]', error)
+    return data || []
+  } catch (e) {
+    console.error('[getWeeklyRanking exception]', e)
+    return []
+  }
+}
+
 async function getSnacks(): Promise<Snack[]> {
   try {
     const { data, error } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })
@@ -23,7 +44,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default async function Home() {
-  const snacks = await getSnacks()
+  const [snacks, ranking] = await Promise.all([getSnacks(), getWeeklyRanking()])
   const picks = shuffle(snacks.filter((s) => s.tags.includes('주인장픽'))).slice(0, 3)
   const categories = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '기타'] as const
 
@@ -32,8 +53,7 @@ export default async function Home() {
       <main className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
         <h1 className="text-3xl font-bold">냠킷 🍱</h1>
         <p className="text-gray-500">냠냠이의 먹킷리스트</p>
-        <p className="text-sm text-gray-400">아직 등록된 간식이 없어요. 어드민에서 추가해보세요!</p>
-        <a href="/admin" className="inline-block mt-4 text-sm text-white bg-orange-500 px-4 py-2 rounded-full">어드민 바로가기</a>
+        <p className="text-sm text-gray-400">아직 등록된 간식이 없어요.</p>
       </main>
     )
   }
@@ -54,7 +74,7 @@ export default async function Home() {
         <div className="flex items-center gap-2">
           <RandomButton snacks={snacks} />
           <a href="/community" className="text-sm font-bold text-white bg-orange-500 px-4 py-2 rounded-full shadow-sm">냠스타 ⭐</a>
-          <a href="/admin" className="text-sm text-gray-400 border border-gray-300 px-3 py-2 rounded-full">어드민</a>
+
         </div>
       </header>
 
@@ -69,6 +89,42 @@ export default async function Home() {
           <h2 className="text-base font-bold mb-3">👑 주인장 픽</h2>
           <div className="grid grid-cols-3 gap-3">
             {picks.map((s) => <SnackCard key={s.id} snack={s} />)}
+          </div>
+        </section>
+      )}
+
+      {/* 냠스타 주간랭킹 */}
+      {ranking.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-bold">⭐ 냠스타 주간랭킹</h2>
+            <a href="/community" className="text-xs text-orange-500">냠스타 보기</a>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {ranking.slice(0, 3).map((item, i) => {
+              const medal = ['🥇', '🥈', '🥉'][i]
+              const cardStyle = [
+                'border-2 border-yellow-400 shadow-md shadow-yellow-100',
+                'border-2 border-gray-300 shadow-sm',
+                'border-2 border-orange-300 shadow-sm shadow-orange-100',
+              ][i]
+              return (
+                <a key={item.id} href="/community" className={`rounded-2xl overflow-hidden bg-white ${cardStyle}`}>
+                  <div className="relative">
+                    {item.image_url
+                      ? <img src={item.image_url} alt={item.snack_name} className="w-full aspect-square object-cover" />
+                      : <div className="w-full aspect-square bg-orange-50 flex items-center justify-center text-3xl">🍱</div>
+                    }
+                    <span className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">👍 {item.recommendations}</span>
+                  </div>
+                  <div className="px-2 py-2">
+                    <p className="text-sm">{medal}</p>
+                    <p className="text-xs font-bold line-clamp-2 leading-snug mt-0.5">{item.snack_name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{item.nickname}</p>
+                  </div>
+                </a>
+              )
+            })}
           </div>
         </section>
       )}

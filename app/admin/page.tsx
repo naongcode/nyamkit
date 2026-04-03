@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Snack, PrepType, Category, Tag, SnackLink } from '@/types/snack'
 
 function calcValueScore(priceApprox: string, volume: string): number | null {
@@ -37,6 +38,7 @@ const emptyForm = {
 }
 
 export default function AdminPage() {
+  const router = useRouter()
   const [tab, setTab] = useState<'form' | 'list'>('form')
   const [url, setUrl] = useState('')
   const [parsing, setParsing] = useState(false)
@@ -161,6 +163,11 @@ export default function AdminPage() {
     fetchSnacks()
   }
 
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+  }
+
   function toggleTag(tag: Tag) {
     setForm((f) => ({
       ...f,
@@ -172,7 +179,10 @@ export default function AdminPage() {
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">냠킷 어드민</h1>
-        <a href="/" className="text-sm text-orange-500 border border-orange-300 px-3 py-1.5 rounded-full">홈으로</a>
+        <div className="flex gap-2">
+          <a href="/" className="text-sm text-orange-500 border border-orange-300 px-3 py-1.5 rounded-full">홈으로</a>
+          <button onClick={handleLogout} className="text-sm text-gray-500 border border-gray-300 px-3 py-1.5 rounded-full hover:bg-gray-50">로그아웃</button>
+        </div>
       </div>
 
       {/* 탭 */}

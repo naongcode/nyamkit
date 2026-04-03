@@ -33,7 +33,7 @@ export default function SnackCard({ snack }: { snack: Snack }) {
           <p className="text-orange-500 font-bold text-sm">{snack.price_approx}</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-400">가격점수</span>
+              <span className="hidden sm:inline text-xs text-gray-400">가격</span>
               <span className="text-base font-black" style={{ color: '#FBBF24', textShadow: '0 1px 3px rgba(251,191,36,0.5)' }}>
                 {'★'.repeat(snack.value_score)}{'☆'.repeat(5 - snack.value_score)}
               </span>
