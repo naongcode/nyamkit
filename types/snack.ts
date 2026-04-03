@@ -31,4 +31,6 @@ export interface Snack {
   purchase_url: string
   image_url: string
   created_at: string
+  likes?: number
+  voter_ids?: string[]
 }

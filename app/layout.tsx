@@ -7,6 +7,7 @@ const geist = Geist({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "냠킷 - 냠냠이의 먹킷리스트",
   description: "가성비 간식 큐레이션 플랫폼",
+  icons: { icon: '/logo.svg' },
 };
 
 export const viewport: Viewport = {

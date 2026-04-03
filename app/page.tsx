@@ -43,8 +43,13 @@ export default async function Home() {
       {/* 헤더 */}
       <header className="py-6 flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-widest text-orange-400 uppercase mb-0.5">냠냠이의 먹킷리스트</p>
-          <h1 className="text-2xl font-bold">냠킷 🍱</h1>
+          <div className="flex items-center gap-3">
+            <img src="/logo.svg" alt="냠킷 로고" className="w-12 h-12" />
+            <div>
+              <p className="text-xs font-semibold tracking-widest text-orange-400 uppercase mb-0.5">냠냠이의 먹킷리스트</p>
+              <h1 className="text-2xl font-bold">냠킷</h1>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <RandomButton snacks={snacks} />

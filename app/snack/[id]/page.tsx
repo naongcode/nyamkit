@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { Snack } from '@/types/snack'
 import ShareButton from '@/components/ShareButton'
+import SnackReactions from '@/components/SnackReactions'
 import { supabase } from '@/lib/supabase'
 
 async function getSnack(id: string): Promise<Snack | null> {
@@ -159,6 +160,9 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
           )}
           <ShareButton name={snack.name} />
         </div>
+
+        {/* 좋아요 + 댓글 */}
+        <SnackReactions snackId={snack.id} initialLikes={snack.likes ?? 0} />
       </div>
     </main>
   )
