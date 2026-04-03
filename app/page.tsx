@@ -53,6 +53,11 @@ export default async function Home() {
         </div>
       </header>
 
+      {/* 쿠팡 파트너스 고지 */}
+      <p className="text-xs text-gray-400 mb-6 leading-relaxed">
+        이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+      </p>
+
       {/* 주인장 픽 */}
       {picks.length > 0 && (
         <section className="mb-8 -mx-4 px-4 py-5 bg-orange-100 rounded-2xl">
