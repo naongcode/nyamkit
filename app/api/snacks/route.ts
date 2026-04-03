@@ -3,6 +3,8 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { Snack } from '@/types/snack'
 
+export const dynamic = 'force-dynamic'
+
 const DATA_PATH = path.join(process.cwd(), 'data', 'snacks.json')
 
 async function readSnacks(): Promise<Snack[]> {

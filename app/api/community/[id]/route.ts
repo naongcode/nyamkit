@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { readPosts, writePosts } from '../route'
 
+export const dynamic = 'force-dynamic'
+
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const { password } = await req.json()

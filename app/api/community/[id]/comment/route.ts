@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { readPosts, writePosts } from '../../route'
 import { CommunityComment } from '@/types/community'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const { nickname, password, text } = await req.json()
