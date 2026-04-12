@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { HoneyCombo, Snack, ComboItem } from '@/types/snack'
+import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { useCart } from '@/lib/useCart'
 
 interface Props {
   combo: HoneyCombo
-  snackMap: Record<string, Snack>
+  snackMap: Record<string, SnackSummary>
   userId: string | null
 }
 
@@ -152,7 +152,7 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
   )
 }
 
-function ItemTile({ item, snack }: { item: ComboItem; snack?: Snack }) {
+function ItemTile({ item, snack }: { item: ComboItem; snack?: SnackSummary }) {
   const { user, addItem, isInCart } = useCart()
   const router = useRouter()
   const [added, setAdded] = useState(false)

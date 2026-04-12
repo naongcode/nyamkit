@@ -1,4 +1,4 @@
-import { HoneyCombo, Snack } from '@/types/snack'
+import { HoneyCombo, SnackSummary } from '@/types/snack'
 import { supabase } from '@/lib/supabase'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import Link from 'next/link'
@@ -12,12 +12,12 @@ async function getCombos(): Promise<HoneyCombo[]> {
     .select('*')
     .order('created_at', { ascending: false })
   if (error) console.error('[getCombos error]', error)
-  return data || []
+  return (data || []) as HoneyCombo[]
 }
 
-async function getSnacks(): Promise<Snack[]> {
+async function getSnacks(): Promise<SnackSummary[]> {
   const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url')
-  return data || []
+  return (data || []) as SnackSummary[]
 }
 
 export default async function CombosPage() {

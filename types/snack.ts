@@ -35,6 +35,8 @@ export interface Snack {
   voter_ids?: string[]
 }
 
+export type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+
 // 꿀조합
 export interface ComboItem {
   type: 'existing' | 'custom'

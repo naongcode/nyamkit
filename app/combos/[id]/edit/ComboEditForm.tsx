@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HoneyCombo, Snack, ComboItem } from '@/types/snack'
 
+type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+
 interface Props {
   combo: HoneyCombo
-  snacks: Snack[]
+  snacks: SnackSummary[]
 }
 
 export default function ComboEditForm({ combo, snacks }: Props) {
@@ -28,7 +30,7 @@ export default function ComboEditForm({ combo, snacks }: Props) {
   const snackMap = Object.fromEntries(snacks.map((s) => [s.id, s]))
   const filteredSnacks = snacks.filter((s) => s.name.toLowerCase().includes(snackSearch.toLowerCase()))
 
-  function addExistingItem(snack: Snack) {
+  function addExistingItem(snack: SnackSummary) {
     if (items.some((i) => i.type === 'existing' && i.snack_id === snack.id)) return
     setItems((prev) => [...prev, { type: 'existing', snack_id: snack.id }])
     setShowSnackPicker(false)

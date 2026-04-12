@@ -14,7 +14,7 @@ export default function MyPage() {
   const supabase = createSupabaseBrowser()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
       setUser(data.user)
       setLoading(false)
     })

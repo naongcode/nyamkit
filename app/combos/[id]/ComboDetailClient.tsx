@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { HoneyCombo, Snack, ComboItem } from '@/types/snack'
+import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
 interface Props {
   combo: HoneyCombo
-  snacks: Snack[]
+  snacks: SnackSummary[]
   userId: string | null
 }
 
@@ -120,7 +120,7 @@ export default function ComboDetailClient({ combo, snacks, userId }: Props) {
   )
 }
 
-function ComboItemCard({ item, snack }: { item: ComboItem; snack?: Snack }) {
+function ComboItemCard({ item, snack }: { item: ComboItem; snack?: SnackSummary }) {
   if (item.type === 'existing' && snack) {
     return (
       <a href={`/snack/${snack.id}`} className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl p-3 shadow-sm active:scale-95 transition-transform">

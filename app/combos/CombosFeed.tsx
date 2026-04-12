@@ -1,11 +1,11 @@
 'use client'
 
-import { HoneyCombo, Snack } from '@/types/snack'
+import { HoneyCombo, Snack, SnackSummary } from '@/types/snack'
 import ComboCard from './ComboCard'
 
 interface Props {
   combos: HoneyCombo[]
-  snacks: Snack[]
+  snacks: SnackSummary[]
   userId: string | null
 }
 

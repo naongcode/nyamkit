@@ -11,9 +11,11 @@ async function getCombo(id: string): Promise<HoneyCombo | null> {
   return data || null
 }
 
-async function getSnacks(): Promise<Snack[]> {
+type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+
+async function getSnacks(): Promise<SnackSummary[]> {
   const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url').order('name')
-  return data || []
+  return (data || []) as SnackSummary[]
 }
 
 export default async function EditComboPage({ params }: { params: Promise<{ id: string }> }) {

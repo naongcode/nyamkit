@@ -6,9 +6,11 @@ import { Snack, ComboItem } from '@/types/snack'
 import { User } from '@supabase/supabase-js'
 import { createSupabaseBrowser } from '@/lib/supabase'
 
+type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+
 interface Props {
   user: User
-  snacks: Snack[]
+  snacks: SnackSummary[]
 }
 
 export default function ComboForm({ user, snacks }: Props) {
@@ -32,7 +34,7 @@ export default function ComboForm({ user, snacks }: Props) {
     s.name.toLowerCase().includes(snackSearch.toLowerCase())
   )
 
-  function addExistingItem(snack: Snack) {
+  function addExistingItem(snack: SnackSummary) {
     if (items.some((i) => i.type === 'existing' && i.snack_id === snack.id)) return
     setItems((prev) => [...prev, { type: 'existing', snack_id: snack.id }])
     setShowSnackPicker(false)
