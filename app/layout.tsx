@@ -7,8 +7,17 @@ const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "냠킷 - 냠냠이의 먹킷리스트",
-  description: "가성비 간식 큐레이션 플랫폼",
+  description: "가성비 간식 큐레이션 플랫폼. 편의점·마트 간식 꿀조합, 혼밥 야식 추천, 가성비 간식 리스트를 모아봤어요.",
+  keywords: ["냠킷", "간식 추천", "가성비 간식", "꿀조합", "야식 추천", "혼밥 간식", "편의점 간식", "먹킷리스트"],
   icons: { icon: '/logo.svg' },
+  openGraph: {
+    title: "냠킷 - 냠냠이의 먹킷리스트",
+    description: "가성비 간식 큐레이션 플랫폼. 꿀조합·야식·혼밥 간식을 모아봤어요.",
+    url: "https://nyamkit.vercel.app",
+    siteName: "냠킷",
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
