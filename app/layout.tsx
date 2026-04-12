@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import BottomNav from "@/components/BottomNav";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko" data-theme="light" style={{ colorScheme: 'light' }}>
       <body className={`${geist.className} min-h-screen bg-orange-50`}>
         {children}
+        <BottomNav />
       </body>
     </html>
   );

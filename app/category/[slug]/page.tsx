@@ -4,7 +4,7 @@ import SnackCard from '@/components/SnackCard'
 import { supabase } from '@/lib/supabase'
 
 const PREP_TYPES: PrepType[] = ['그냥먹기', '전자레인지', '에어프라이어', '끓이기', '전기밥솥']
-const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '기타']
+const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '야채', '소스·양념', '기타']
 
 async function getSnacks(): Promise<Snack[]> {
   const { data } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })
@@ -37,7 +37,7 @@ export default async function CategoryPage({
   }
 
   return (
-    <main className="max-w-2xl mx-auto pb-16">
+    <main className="max-w-2xl mx-auto pb-24">
       <header className="px-4 py-5 flex items-center gap-3">
         <a href="/" className="text-gray-400 text-sm">←</a>
         <h1 className="text-xl font-bold">{category}</h1>
@@ -46,6 +46,12 @@ export default async function CategoryPage({
 
       {/* 카테고리 탭 */}
       <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 pb-3 mb-2">
+        <a
+          href="/category"
+          className="shrink-0 text-sm px-4 py-1.5 rounded-full border font-medium transition-colors border-gray-300 text-gray-500"
+        >
+          전체
+        </a>
         {activeCategories.map((cat) => (
           <a
             key={cat}
@@ -93,7 +99,7 @@ export default async function CategoryPage({
         </a>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-2">
         {filtered.map((s) => <SnackCard key={s.id} snack={s} />)}
       </div>
       </div>

@@ -16,7 +16,7 @@ function calcValueScore(priceApprox: string, volume: string): number | null {
   return 1
 }
 
-const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '기타']
+const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '야채', '소스·양념', '기타']
 const PREP_TYPES: PrepType[] = ['그냥먹기', '전자레인지', '에어프라이어', '끓이기', '전기밥솥']
 const ALL_TAGS: Tag[] = ['주인장픽', '신상', '혼밥', '야식', '든든함', '간단함']
 
@@ -39,7 +39,9 @@ const emptyForm = {
 
 export default function AdminPage() {
   const router = useRouter()
-  const [tab, setTab] = useState<'form' | 'list'>('form')
+  const [tab, setTab] = useState<'form' | 'list' | 'requests'>('form')
+  const [requests, setRequests] = useState<{ id: string; product_name: string; memo: string | null; status: string; created_at: string }[]>([])
+  const [pendingRequestId, setPendingRequestId] = useState<string | null>(null)
   const [url, setUrl] = useState('')
   const [parsing, setParsing] = useState(false)
   const [form, setForm] = useState(emptyForm)
@@ -148,6 +150,12 @@ export default function AdminPage() {
         setForm(emptyForm)
         setUrl('')
         fetchSnacks()
+        if (pendingRequestId) {
+          const saved = await res.json()
+          await fetch(`/api/requests/${pendingRequestId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'done', snack_id: saved.id }) })
+          setRequests(prev => prev.map(x => x.id === pendingRequestId ? { ...x, status: 'done' } : x))
+          setPendingRequestId(null)
+        }
       }
     } finally {
       setSaving(false)
@@ -198,6 +206,17 @@ export default function AdminPage() {
           className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${tab === 'list' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}
         >
           목록 ({snacks.length})
+        </button>
+        <button
+          onClick={async () => {
+            setTab('requests')
+            const res = await fetch('/api/requests')
+            const data = await res.json()
+            setRequests(data)
+          }}
+          className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${tab === 'requests' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}
+        >
+          요청
         </button>
       </div>
 
@@ -424,6 +443,69 @@ export default function AdminPage() {
         </>
       )}
 
+      {/* 요청 탭 */}
+      {tab === 'requests' && (
+        <section className="space-y-2">
+          {requests.length === 0 && <p className="text-sm text-gray-400 text-center py-10">요청이 없어요</p>}
+          {requests.map((r) => (
+            <div key={r.id} className="border rounded-lg px-3 py-2 flex items-center gap-2">
+              {/* 텍스트 */}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm truncate">{r.product_name}</p>
+                {r.memo && <p className="text-xs text-gray-400 truncate">{r.memo}</p>}
+              </div>
+
+              {/* 상태 + 버튼 */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  r.status === 'done' ? 'bg-green-100 text-green-600' :
+                  r.status === 'rejected' ? 'bg-red-100 text-red-400' :
+                  'bg-orange-100 text-orange-500'
+                }`}>
+                  {r.status === 'done' ? '완료' : r.status === 'rejected' ? '거절' : '대기'}
+                </span>
+
+                {r.status === 'pending' && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setForm({ ...emptyForm, name: r.product_name })
+                        setPendingRequestId(r.id)
+                        setTab('form')
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className="text-xs text-orange-500 border border-orange-300 px-2 py-0.5 rounded font-medium"
+                    >
+                      등록
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await fetch(`/api/requests/${r.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'done' }) })
+                        setRequests(prev => prev.map(x => x.id === r.id ? { ...x, status: 'done' } : x))
+                      }}
+                      className="text-xs text-green-600 border border-green-300 px-2 py-0.5 rounded"
+                    >
+                      완료
+                    </button>
+                  </>
+                )}
+                {r.status !== 'pending' && (
+                  <button
+                    onClick={async () => {
+                      await fetch(`/api/requests/${r.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'pending' }) })
+                      setRequests(prev => prev.map(x => x.id === r.id ? { ...x, status: 'pending' } : x))
+                    }}
+                    className="text-xs text-gray-400 border border-gray-200 px-2 py-0.5 rounded"
+                  >
+                    되돌리기
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
       {/* 목록 탭 */}
       {tab === 'list' && (
         <section>
@@ -439,7 +521,7 @@ export default function AdminPage() {
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => handleEdit(s)} className="flex-1 text-xs text-blue-500 border border-blue-300 py-1 rounded">수정</button>
-                  <button onClick={() => handleDelete(s.id)} className="flex-1 text-xs text-red-500 border border-red-300 py-1 rounded">삭제</button>
+                  <button onClick={() => { if (window.confirm(`"${s.name}" 을 삭제할까요?`)) handleDelete(s.id) }} className="flex-1 text-xs text-red-500 border border-red-300 py-1 rounded">삭제</button>
                 </div>
               </div>
             ))}

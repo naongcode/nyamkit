@@ -1,4 +1,4 @@
-import { Snack } from '@/types/snack'
+import { Snack, HoneyCombo } from '@/types/snack'
 import SnackCard from '@/components/SnackCard'
 import SnackCardSmall from '@/components/SnackCardSmall'
 import RandomButton from '@/components/RandomButton'
@@ -37,6 +37,21 @@ async function getSnacks(): Promise<Snack[]> {
   }
 }
 
+async function getRecentCombos(): Promise<HoneyCombo[]> {
+  try {
+    const { data, error } = await supabase
+      .from('honey_combos')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(6)
+    if (error) console.error('[getRecentCombos error]', error)
+    return data || []
+  } catch (e) {
+    console.error('[getRecentCombos exception]', e)
+    return []
+  }
+}
+
 export const dynamic = 'force-dynamic'
 
 function shuffle<T>(arr: T[]): T[] {
@@ -44,9 +59,14 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default async function Home() {
-  const [snacks, ranking] = await Promise.all([getSnacks(), getWeeklyRanking()])
+  const [snacks, ranking, combos] = await Promise.all([getSnacks(), getWeeklyRanking(), getRecentCombos()])
   const picks = shuffle(snacks.filter((s) => s.tags.includes('주인장픽'))).slice(0, 3)
-  const categories = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '기타'] as const
+
+  // 상품이 있는 카테고리 중 랜덤 1개
+  const categories = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '야채', '소스·양념', '기타'] as const
+  const filledCategories = categories.filter((cat) => snacks.some((s) => s.category === cat))
+  const randomCat = shuffle(filledCategories)[0]
+  const randomCatItems = randomCat ? shuffle(snacks.filter((s) => s.category === randomCat)).slice(0, 10) : []
 
   if (snacks.length === 0) {
     return (
@@ -59,7 +79,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 pb-16">
+    <main className="max-w-2xl mx-auto px-4 pb-24">
       {/* 헤더 */}
       <header className="py-6 flex items-center justify-between">
         <div>
@@ -73,8 +93,6 @@ export default async function Home() {
         </div>
         <div className="flex items-center gap-2">
           <RandomButton snacks={snacks} />
-          <a href="/community" className="text-sm font-bold text-white bg-orange-500 px-4 py-2 rounded-full shadow-sm">냠스타 ⭐</a>
-
         </div>
       </header>
 
@@ -129,26 +147,66 @@ export default async function Home() {
         </section>
       )}
 
-      {/* 카테고리별 */}
-      {categories.map((cat) => {
-        const items = shuffle(snacks.filter((s) => s.category === cat)).slice(0, 10)
-        if (items.length === 0) return null
-        return (
-          <section key={cat} className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-bold text-gray-700">{cat}</h2>
-              <a href={`/category/${encodeURIComponent(cat)}`} className="text-xs text-orange-500">더보기</a>
+      {/* 꿀조합 */}
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold">🍯 꿀조합</h2>
+          <a href="/combos" className="text-xs text-orange-500">전체보기</a>
+        </div>
+        {combos.length === 0 ? (
+          <div className="rounded-2xl bg-orange-50 py-10 flex flex-col items-center gap-2 text-center">
+            <span className="text-3xl">🍯</span>
+            <p className="text-sm font-medium text-gray-600">아직 꿀조합이 없어요</p>
+            <a href="/combos/new" className="mt-1 text-xs bg-orange-500 text-white px-4 py-1.5 rounded-full font-medium">첫 조합 올리기</a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2">
+            {combos.map((combo) => {
+              const snackMap = Object.fromEntries(snacks.map((s) => [s.id, s]))
+              const thumb = combo.image_url
+                || combo.items.map(i => i.type === 'existing' && i.snack_id ? snackMap[i.snack_id]?.image_url : null).find(Boolean)
+                || null
+              return (
+                <a key={combo.id} href={`/combos/${combo.id}`} className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm active:scale-95 transition-transform">
+                  <div className="relative">
+                    {thumb
+                      ? <img src={thumb} alt={combo.title} className="w-full aspect-square object-cover" />
+                      : <div className="w-full aspect-square bg-orange-50 flex items-center justify-center text-3xl">🍯</div>
+                    }
+                  </div>
+                  <div className="px-2 py-2">
+                    <p className="text-xs font-bold line-clamp-1">{combo.title}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{combo.items.length}가지</p>
+                  </div>
+                </a>
+              )
+            })}
+          </div>
+        )}
+        <a href="/combos/new" className="mt-3 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-xl border border-dashed border-orange-300 text-orange-500 text-sm font-medium">
+          <span>+</span> 꿀조합 올리기
+        </a>
+      </section>
+
+      {/* 랜덤 카테고리 */}
+      {randomCat && randomCatItems.length > 0 && (
+        <section className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-gray-700">🎲 {randomCat}</h2>
+              <a href="/category" className="text-xs text-gray-400 border border-gray-200 rounded-full px-2 py-0.5">전체 카테고리</a>
             </div>
-            <ScrollRow>
-              {items.map((s) => (
-                <div key={s.id} className="w-36 sm:w-44 shrink-0">
-                  <SnackCard snack={s} />
-                </div>
-              ))}
-            </ScrollRow>
-          </section>
-        )
-      })}
+            <a href={`/category/${encodeURIComponent(randomCat)}`} className="text-xs text-orange-500">전체보기</a>
+          </div>
+          <ScrollRow>
+            {randomCatItems.map((s) => (
+              <div key={s.id} className="w-36 sm:w-44 shrink-0">
+                <SnackCard snack={s} />
+              </div>
+            ))}
+          </ScrollRow>
+        </section>
+      )}
     </main>
   )
 }

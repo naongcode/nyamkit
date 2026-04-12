@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { Snack } from '@/types/snack'
 import ShareButton from '@/components/ShareButton'
 import SnackReactions from '@/components/SnackReactions'
+import AddToCartButton from '@/components/AddToCartButton'
 import { supabase } from '@/lib/supabase'
 
 async function getSnack(id: string): Promise<Snack | null> {
@@ -29,7 +30,7 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
   const perHundredG = priceNum && gramsNum ? Math.round((priceNum / gramsNum) * 100).toLocaleString('ko-KR') : null
 
   return (
-    <main className="max-w-lg mx-auto pb-10">
+    <main className="max-w-lg mx-auto pb-24">
       {/* 뒤로가기 */}
       <div className="px-4 pt-4 pb-4">
         <a href="/" className="text-sm text-orange-500 border border-orange-300 px-3 py-1.5 rounded-full">홈으로</a>
@@ -148,6 +149,13 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
 
         {/* 액션 버튼 */}
         <div className="flex gap-3 pt-1">
+          <AddToCartButton
+            snack_id={snack.id}
+            name={snack.name}
+            image_url={snack.image_url}
+            price_approx={snack.price_approx}
+            purchase_url={snack.purchase_url}
+          />
           {snack.purchase_url && (
             <a
               href={snack.purchase_url}
@@ -155,7 +163,7 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
               rel="noopener noreferrer"
               className="flex-1 bg-orange-500 text-white py-3.5 rounded-full font-semibold text-center text-sm hover:bg-orange-600 transition-colors"
             >
-              사러가기 🛒
+              사러가기 →
             </a>
           )}
           <ShareButton name={snack.name} />

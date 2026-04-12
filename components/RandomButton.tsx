@@ -1,24 +1,20 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { Snack } from '@/types/snack'
 
 export default function RandomButton({ snacks }: { snacks: Snack[] }) {
-  const router = useRouter()
 
   function handleRandom() {
-    if (snacks.length === 0) return
-    const pick = snacks[Math.floor(Math.random() * snacks.length)]
-    router.push(`/snack/${pick.id}`)
+    window.open('https://link.coupang.com/a/enA7f7', '_blank', 'noopener,noreferrer')
   }
 
   return (
     <button
       onClick={handleRandom}
-      className="text-gray-500 border border-gray-300 text-sm px-3 sm:px-4 py-2 rounded-full font-medium"
+      className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 sm:px-4 py-2 rounded-full font-medium transition"
     >
-      <span className="sm:hidden">🎲</span>
-      <span className="hidden sm:inline">오늘 뭐 먹지? 🎲</span>
+      <span className="sm:hidden">쿠팡</span>
+      <span className="hidden sm:inline">바로 쿠팡가기</span>
     </button>
   )
 }

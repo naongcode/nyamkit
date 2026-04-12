@@ -307,7 +307,7 @@ export default function CommunityFeed() {
   }
 
   return (
-    <main className="max-w-lg mx-auto pb-16">
+    <main className="max-w-lg mx-auto pb-24">
       {/* 헤더 */}
       <header className="px-4 pt-6 pb-4">
         <a href="/" className="text-sm text-orange-500 border border-orange-300 px-3 py-1.5 rounded-full">홈으로</a>
