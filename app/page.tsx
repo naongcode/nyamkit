@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Snack, HoneyCombo } from '@/types/snack'
 import SnackCard from '@/components/SnackCard'
 import SnackCardSmall from '@/components/SnackCardSmall'
@@ -52,7 +53,7 @@ async function getRecentCombos(): Promise<HoneyCombo[]> {
   }
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60 // 60초 캐시
 
 function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5)
@@ -128,10 +129,10 @@ export default async function Home() {
               ][i]
               return (
                 <a key={item.id} href="/community" className={`rounded-2xl overflow-hidden bg-white ${cardStyle}`}>
-                  <div className="relative">
+                  <div className="relative aspect-square">
                     {item.image_url
-                      ? <img src={item.image_url} alt={item.snack_name} className="w-full aspect-square object-cover" />
-                      : <div className="w-full aspect-square bg-orange-50 flex items-center justify-center text-3xl">🍱</div>
+                      ? <Image src={item.image_url} alt={item.snack_name} fill className="object-cover" sizes="33vw" />
+                      : <div className="w-full h-full bg-orange-50 flex items-center justify-center text-3xl">🍱</div>
                     }
                     <span className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">👍 {item.recommendations}</span>
                   </div>
@@ -168,10 +169,10 @@ export default async function Home() {
                 || null
               return (
                 <a key={combo.id} href={`/combos/${combo.id}`} className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm active:scale-95 transition-transform">
-                  <div className="relative">
+                  <div className="relative aspect-square">
                     {thumb
-                      ? <img src={thumb} alt={combo.title} className="w-full aspect-square object-cover" />
-                      : <div className="w-full aspect-square bg-orange-50 flex items-center justify-center text-3xl">🍯</div>
+                      ? <Image src={thumb} alt={combo.title} fill className="object-cover" sizes="33vw" />
+                      : <div className="w-full h-full bg-orange-50 flex items-center justify-center text-3xl">🍯</div>
                     }
                   </div>
                   <div className="px-2 py-2">
