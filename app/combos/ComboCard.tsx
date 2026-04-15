@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { useCart } from '@/lib/useCart'
 
@@ -91,9 +92,9 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
       {/* 이미지 영역: CSS Grid으로 왼쪽 높이 = 오른쪽 높이 */}
       <div className="px-3 pb-3 grid grid-cols-[48%_1fr] gap-2">
         {/* 대표 이미지 — aspect-square가 행 높이를 결정 */}
-        <div className="aspect-square rounded-xl overflow-hidden bg-orange-50">
+        <div className="relative aspect-square rounded-xl overflow-hidden bg-orange-50">
           {heroImage
-            ? <img src={heroImage} alt={combo.title} className="w-full h-full object-cover" />
+            ? <Image src={heroImage} alt={combo.title} fill className="object-cover" sizes="45vw" />
             : <div className="w-full h-full flex items-center justify-center text-3xl">🍯</div>
           }
         </div>
@@ -186,7 +187,7 @@ function ItemTile({ item, snack }: { item: ComboItem; snack?: SnackSummary }) {
       className={`relative w-full h-full rounded-lg overflow-hidden bg-gray-50 ${isClickable ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
     >
       {image
-        ? <img src={image} alt={name} className="w-full h-full object-cover" />
+        ? <Image src={image} alt={name} fill className="object-cover" sizes="22vw" />
         : <div className="w-full h-full flex items-center justify-center text-lg">{item.type === 'existing' ? '🍱' : '🛒'}</div>
       }
       {/* 이름 오버레이 */}

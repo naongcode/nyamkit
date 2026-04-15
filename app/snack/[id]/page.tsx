@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { Snack } from '@/types/snack'
 import ShareButton from '@/components/ShareButton'
 import SnackReactions from '@/components/SnackReactions'
@@ -39,11 +40,11 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
       {/* 이미지 + 기본 정보 */}
       <div className="px-4 flex flex-col sm:flex-row gap-4">
         {/* 이미지 */}
-        <div className="shrink-0 rounded-2xl overflow-hidden bg-gray-100 shadow-sm mx-auto sm:mx-0">
+        <div className="relative shrink-0 w-52 h-52 rounded-2xl overflow-hidden bg-gray-100 shadow-sm mx-auto sm:mx-0">
           {snack.image_url ? (
-            <img src={snack.image_url} alt={snack.name} className="h-52 w-auto object-contain" />
+            <Image src={snack.image_url} alt={snack.name} fill className="object-contain" sizes="208px" />
           ) : (
-            <div className="h-52 w-52 flex items-center justify-center text-5xl">🍱</div>
+            <div className="w-full h-full flex items-center justify-center text-5xl">🍱</div>
           )}
         </div>
 

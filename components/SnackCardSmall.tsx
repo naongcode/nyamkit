@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Snack } from '@/types/snack'
 
 const PREP_EMOJI: Record<string, string> = {
@@ -13,9 +14,9 @@ export default function SnackCardSmall({ snack }: { snack: Snack }) {
   return (
     <Link href={`/snack/${snack.id}`} className="block">
       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex gap-4 p-3 items-center">
-        <div className="w-20 h-20 rounded-xl bg-gray-100 shrink-0 overflow-hidden">
+        <div className="relative w-20 h-20 rounded-xl bg-gray-100 shrink-0 overflow-hidden">
           {snack.image_url ? (
-            <img src={snack.image_url} alt={snack.name} className="w-full h-full object-cover" />
+            <Image src={snack.image_url} alt={snack.name} fill className="object-cover" sizes="80px" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-3xl">🍱</div>
           )}

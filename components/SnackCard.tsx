@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Snack } from '@/types/snack'
 
 const PREP_EMOJI: Record<string, string> = {
@@ -15,12 +16,12 @@ export default function SnackCard({ snack }: { snack: Snack }) {
       <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="relative aspect-square bg-gray-100">
           {snack.image_url ? (
-            <img src={snack.image_url} alt={snack.name} className="w-full h-full object-cover" />
+            <Image src={snack.image_url} alt={snack.name} fill className="object-cover" sizes="(max-width: 768px) 33vw, 200px" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-4xl">🍱</div>
           )}
           {'주인장픽' in snack.tags || snack.tags.includes('주인장픽') ? (
-            <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-medium z-10">
               주인장픽
             </span>
           ) : null}
