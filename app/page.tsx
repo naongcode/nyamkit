@@ -63,7 +63,7 @@ export default async function Home() {
   const picks = shuffle(snacks.filter((s) => s.tags.includes('주인장픽'))).slice(0, 3)
 
   // 상품이 있는 카테고리 중 랜덤 1개
-  const categories = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '야채', '소스·양념', '기타'] as const
+  const categories = ['냉동식품', '과자', '라면·면·즉석', '음료', '편의점', '야채', '소스·양념·재료', '기타'] as const
   const filledCategories = categories.filter((cat) => snacks.some((s) => s.category === cat))
   const randomCat = shuffle(filledCategories)[0]
   const randomCatItems = randomCat ? shuffle(snacks.filter((s) => s.category === randomCat)).slice(0, 10) : []

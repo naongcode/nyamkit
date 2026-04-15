@@ -1,0 +1,24 @@
+{
+  "name": "냠킷 - 냠냠이의 먹킷리스트",
+  "short_name": "냠킷",
+  "description": "가성비 간식 큐레이션 플랫폼. 꿀조합·야식·혼밥 간식을 모아봤어요.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff7ed",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import SnackCard from '@/components/SnackCard'
 import { supabase } from '@/lib/supabase'
 
 const PREP_TYPES: PrepType[] = ['그냥먹기', '전자레인지', '에어프라이어', '끓이기', '전기밥솥']
-const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·즉석', '음료', '편의점', '야채', '소스·양념', '기타']
+const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·면·즉석', '음료', '편의점', '야채', '소스·양념·재료', '기타']
 
 async function getSnacks(): Promise<Snack[]> {
   const { data } = await supabase.from('snacks').select('*').order('created_at', { ascending: false })

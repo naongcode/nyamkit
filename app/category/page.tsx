@@ -5,11 +5,11 @@ import Link from 'next/link'
 const CATEGORIES: { name: Category; emoji: string; desc: string }[] = [
   { name: '냉동식품', emoji: '🧊', desc: '간편하게 즐기는 냉동 간식' },
   { name: '과자',     emoji: '🍪', desc: '손이 멈추지 않는 과자들' },
-  { name: '라면·즉석', emoji: '🍜', desc: '뜨끈하고 간편한 한 끼' },
+  { name: '라면·면·즉석', emoji: '🍜', desc: '뜨끈하고 간편한 한 끼' },
   { name: '음료',     emoji: '🥤', desc: '시원하고 달달한 음료' },
   { name: '편의점',   emoji: '🏪', desc: '편의점 인기 간식 모음' },
   { name: '야채',     emoji: '🥬', desc: '신선하고 건강한 야채류' },
-  { name: '소스·양념', emoji: '🫙', desc: '요리를 살리는 소스와 양념' },
+  { name: '소스·양념·재료', emoji: '🫙', desc: '요리를 살리는 소스와 양념' },
   { name: '기타',     emoji: '🍱', desc: '그 외 다양한 먹거리' },
 ]
 
