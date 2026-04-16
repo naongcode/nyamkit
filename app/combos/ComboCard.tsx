@@ -8,6 +8,12 @@ import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { useCart } from '@/lib/useCart'
 import { calcItemCost } from '@/lib/calcItemCost'
 
+function fmtDate(iso: string) {
+  const s = iso.slice(0, 10)
+  const [y, m, d] = s.split('-')
+  return `${y}. ${Number(m)}. ${Number(d)}.`
+}
+
 interface Props {
   combo: HoneyCombo
   snackMap: Record<string, SnackSummary>
@@ -76,7 +82,7 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
               🍯 {likes > 0 ? likes : ''}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">{combo.nickname} · {combo.items.length}가지 · {new Date(combo.created_at).toLocaleDateString('ko-KR')}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{combo.nickname} · {combo.items.length}가지 · {fmtDate(combo.created_at)}</p>
         </div>
         {isOwner && (
           <div className="flex items-center gap-1.5 shrink-0">

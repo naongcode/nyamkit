@@ -7,6 +7,12 @@ import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import { calcItemCost } from '@/lib/calcItemCost'
 
+function fmtDate(iso: string) {
+  const s = iso.slice(0, 10)
+  const [y, m, d] = s.split('-')
+  return `${y}. ${Number(m)}. ${Number(d)}.`
+}
+
 interface Props {
   combo: HoneyCombo
   snacks: SnackSummary[]
@@ -90,7 +96,7 @@ export default function ComboDetailClient({ combo, snacks, userId }: Props) {
 
       {/* 정보 */}
       <div className="mb-5">
-        <p className="text-xs text-gray-400 mb-1">{combo.nickname} · {new Date(combo.created_at).toLocaleDateString('ko-KR')}</p>
+        <p className="text-xs text-gray-400 mb-1">{combo.nickname} · {fmtDate(combo.created_at)}</p>
         <h2 className="text-xl font-bold">{combo.title}</h2>
         {combo.description && (
           <p className="mt-2 text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{combo.description}</p>
