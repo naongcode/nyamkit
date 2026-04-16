@@ -26,20 +26,23 @@ export function calcItemCost(
     if (den > 0) return Math.round(price * (num / den))
   }
 
+  // volume 정규화: "375" → "375g" (단위 없으면 g 기본)
+  const volNormalized = volume && /^\d+\.?\d*$/.test(volume.trim()) ? volume.trim() + 'g' : volume
+
   // "20g" / "50ml" / "0.5kg" / "1l" 형식 → 무게·용량 기반
   // 단위 없이 숫자만 입력된 경우 volume에서 단위 추론
   let weightInput = ua
-  if (/^\d+\.?\d*$/.test(ua) && volume) {
-    const inferredUnit = volume.match(/\d+\.?\d*\s*(g|ml|kg|l|cc)/i)?.[1]
+  if (/^\d+\.?\d*$/.test(ua) && volNormalized) {
+    const inferredUnit = volNormalized.match(/\d+\.?\d*\s*(g|ml|kg|l|cc)/i)?.[1]
     if (inferredUnit) weightInput = ua + inferredUnit
   }
   const weightMatch = weightInput.match(/^(\d+\.?\d*)\s*(g|ml|kg|l|cc)$/i)
-  if (weightMatch && volume) {
+  if (weightMatch && volNormalized) {
     const useNum = parseFloat(weightMatch[1])
     const useUnit = weightMatch[2].toLowerCase()
     const useNorm = useUnit === 'kg' ? useNum * 1000 : useUnit === 'l' ? useNum * 1000 : useNum
 
-    const volMatch = volume.match(/(\d+\.?\d*)\s*(g|ml|kg|l|cc)/i)
+    const volMatch = volNormalized.match(/(\d+\.?\d*)\s*(g|ml|kg|l|cc)/i)
     if (volMatch) {
       const volNum = parseFloat(volMatch[1])
       const volUnit = volMatch[2].toLowerCase()
@@ -66,6 +69,8 @@ export function getUseAmountPlaceholder(
   if (volume) {
     const m = volume.match(/\d+\.?\d*\s*(g|ml|kg|l|cc)/i)
     if (m) return `예: 20${m[1].toLowerCase()}`
+    // 단위 없는 순수 숫자 volume → g 기본
+    if (/^\d+\.?\d*$/.test(volume.trim())) return '예: 20g'
   }
   if (pkg_count) return `예: 1개 (총 ${pkg_count}개)`
   return '예: 20g, 1/20, 1개'
