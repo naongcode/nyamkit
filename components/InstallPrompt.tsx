@@ -7,6 +7,9 @@ export default function InstallPrompt() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
+    const dismissed = localStorage.getItem('installPromptDismissed')
+    if (dismissed && dismissed === new Date().toDateString()) return
+
     const handler = (e: any) => {
       e.preventDefault()
       setPrompt(e)
@@ -33,7 +36,7 @@ export default function InstallPrompt() {
         <p className="text-xs text-gray-400">홈화면에 추가하고 빠르게 접속해요</p>
       </div>
       <div className="flex gap-2">
-        <button onClick={() => setShow(false)} className="text-xs text-gray-400 px-2 py-1">닫기</button>
+        <button onClick={() => { localStorage.setItem('installPromptDismissed', new Date().toDateString()); setShow(false) }} className="text-xs text-gray-400 px-2 py-1">닫기</button>
         <button onClick={handleInstall} className="text-xs bg-orange-500 text-white px-3 py-1.5 rounded-full font-medium">설치</button>
       </div>
     </div>
