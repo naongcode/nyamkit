@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { useCart } from '@/lib/useCart'
+import { calcItemCost } from '@/lib/calcItemCost'
 
 interface Props {
   combo: HoneyCombo
@@ -94,7 +95,7 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
         {/* 대표 이미지 — aspect-square가 행 높이를 결정 */}
         <div className="relative aspect-square rounded-xl overflow-hidden bg-orange-50">
           {heroImage
-            ? <Image src={heroImage} alt={combo.title} fill className="object-cover" sizes="45vw" />
+            ? <img src={heroImage} alt={combo.title} className="w-full h-full object-cover" />
             : <div className="w-full h-full flex items-center justify-center text-3xl">🍯</div>
           }
         </div>
@@ -135,6 +136,9 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
         </div>
       </div>
 
+      {/* 원가 요약 */}
+      <ComboCostBadge items={combo.items} snackMap={snackMap} />
+
       {/* 설명 */}
       {combo.description && (
         <div className="px-4 pb-2">
@@ -150,6 +154,43 @@ export default function ComboCard({ combo, snackMap, userId }: Props) {
       )}
 
     </article>
+  )
+}
+
+function ComboCostBadge({ items, snackMap }: { items: ComboItem[]; snackMap: Record<string, SnackSummary> }) {
+  // 총 구입 합계 (가격 있는 재료 기준)
+  let purchaseTotal = 0
+  let purchaseCounted = 0
+  // 실사용 원가 (use_amount 입력된 재료 기준)
+  let usageCost = 0
+  let usageCounted = 0
+
+  for (const item of items) {
+    const snack = item.type === 'existing' && item.snack_id ? snackMap[item.snack_id] : undefined
+    const priceStr = snack?.price_approx || item.price
+    const priceNum = priceStr ? Number(priceStr.replace(/[^0-9]/g, '')) : 0
+    if (priceNum > 0) { purchaseTotal += priceNum; purchaseCounted++ }
+
+    const cost = calcItemCost(priceStr, snack?.volume, snack?.pkg_count, item.use_amount)
+    if (cost !== null) { usageCost += cost; usageCounted++ }
+  }
+
+  if (purchaseTotal === 0) return null
+
+  return (
+    <div className="mx-4 mb-3 flex items-center gap-2 text-xs flex-wrap">
+      <span className="bg-gray-100 text-gray-600 font-medium px-2.5 py-1 rounded-full">
+        구입 합계 약 {purchaseTotal.toLocaleString('ko-KR')}원{purchaseCounted < items.length ? ` (${purchaseCounted}종)` : ''}
+      </span>
+      {usageCounted > 0 && (
+        <>
+          <span className="text-gray-300">·</span>
+          <span className="bg-orange-50 text-orange-500 font-semibold px-2.5 py-1 rounded-full">
+            실사용 약 {usageCost.toLocaleString('ko-KR')}원
+          </span>
+        </>
+      )}
+    </div>
   )
 }
 

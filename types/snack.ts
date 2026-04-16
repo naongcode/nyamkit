@@ -23,6 +23,7 @@ export interface Snack {
   category: Category
   price_approx: string
   volume: string
+  pkg_count?: number            // 총 개수 (예: 식빵 20장)
   value_score: number        // 1~5
   prep_type: PrepType
   tags: Tag[]
@@ -35,7 +36,7 @@ export interface Snack {
   voter_ids?: string[]
 }
 
-export type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+export type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url' | 'volume' | 'pkg_count'>
 
 // 꿀조합
 export interface ComboItem {
@@ -45,6 +46,7 @@ export interface ComboItem {
   price?: string      // type === 'custom'
   url?: string        // type === 'custom'
   note?: string
+  use_amount?: string // 사용량 (예: "20g", "1/20", "1개")
 }
 
 export interface HoneyCombo {

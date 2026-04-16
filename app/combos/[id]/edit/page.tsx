@@ -11,10 +11,10 @@ async function getCombo(id: string): Promise<HoneyCombo | null> {
   return data || null
 }
 
-type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url' | 'volume' | 'pkg_count'>
 
 async function getSnacks(): Promise<SnackSummary[]> {
-  const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url').order('name')
+  const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url, volume, pkg_count').order('name')
   return (data || []) as SnackSummary[]
 }
 

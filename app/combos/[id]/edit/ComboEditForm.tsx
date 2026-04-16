@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HoneyCombo, Snack, ComboItem } from '@/types/snack'
+import { calcItemCost, getUseAmountPlaceholder } from '@/lib/calcItemCost'
 
-type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url'>
+type SnackSummary = Pick<Snack, 'id' | 'name' | 'image_url' | 'price_approx' | 'purchase_url' | 'volume' | 'pkg_count'>
 
 interface Props {
   combo: HoneyCombo
@@ -55,6 +56,10 @@ export default function ComboEditForm({ combo, snacks }: Props) {
 
   function updateItemNote(index: number, note: string) {
     setItems((prev) => prev.map((item, i) => i === index ? { ...item, note } : item))
+  }
+
+  function updateItemUseAmount(index: number, use_amount: string) {
+    setItems((prev) => prev.map((item, i) => i === index ? { ...item, use_amount: use_amount || undefined } : item))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -157,8 +162,29 @@ export default function ComboEditForm({ combo, snacks }: Props) {
                         </svg>
                       </button>
                     </div>
+                    {/* 사용량 + 원가 미리보기 */}
+                    <div className="mt-2 flex items-center gap-2">
+                      <input
+                        value={item.use_amount || ''}
+                        onChange={(e) => updateItemUseAmount(i, e.target.value)}
+                        className="flex-1 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-orange-400"
+                        placeholder={`사용량 — ${getUseAmountPlaceholder(snack?.volume, snack?.pkg_count)}`}
+                        maxLength={20}
+                      />
+                      {(() => {
+                        const cost = calcItemCost(
+                          snack?.price_approx || item.price,
+                          snack?.volume,
+                          snack?.pkg_count,
+                          item.use_amount,
+                        )
+                        return cost !== null
+                          ? <span className="text-xs text-orange-500 font-semibold shrink-0">≈ {cost.toLocaleString('ko-KR')}원</span>
+                          : null
+                      })()}
+                    </div>
                     <input value={item.note || ''} onChange={(e) => updateItemNote(i, e.target.value)}
-                      className="mt-2 w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-orange-400"
+                      className="mt-1.5 w-full bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-orange-400"
                       placeholder="메모 (선택)" maxLength={50} />
                   </div>
                 )

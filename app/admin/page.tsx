@@ -27,6 +27,7 @@ const emptyForm = {
   category: '기타' as Category,
   price_approx: '',
   volume: '',
+  pkg_count: '',
   value_score: 3,
   prep_type: '그냥먹기' as PrepType,
   tags: [] as Tag[],
@@ -95,6 +96,7 @@ export default function AdminPage() {
       category: snack.category,
       price_approx: snack.price_approx,
       volume: snack.volume,
+      pkg_count: snack.pkg_count ? String(snack.pkg_count) : '',
       value_score: snack.value_score,
       prep_type: snack.prep_type,
       tags: snack.tags,
@@ -127,6 +129,7 @@ export default function AdminPage() {
         category: form.category,
         price_approx: form.price_approx,
         volume: form.volume,
+        pkg_count: form.pkg_count ? Number(form.pkg_count) : undefined,
         value_score: form.value_score,
         prep_type: form.prep_type,
         tags: form.tags,
@@ -301,31 +304,41 @@ export default function AdminPage() {
                   }}
                 />
               </Field>
-              <Field label="가성비 점수">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      onClick={() => setForm({ ...form, value_score: n })}
-                      className={`text-2xl transition-all duration-150 ${n <= form.value_score ? 'text-yellow-400 scale-110 drop-shadow-sm' : 'text-gray-200'}`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-                {(() => {
-                  const price = Number(form.price_approx.replace(/[^0-9]/g, ''))
-                  const grams = Number(form.volume.replace(/[^0-9]/g, ''))
-                  if (!price || !grams) return null
-                  const per100g = Math.round((price / grams) * 100)
-                  return (
-                    <p className="text-xs text-gray-400 mt-1">
-                      {per100g.toLocaleString('ko-KR')}원/100g
-                    </p>
-                  )
-                })()}
+              <Field label="총 개수 (선택)">
+                <input
+                  className={inputCls}
+                  type="number"
+                  placeholder="예: 20"
+                  value={form.pkg_count}
+                  onChange={(e) => setForm((f) => ({ ...f, pkg_count: e.target.value }))}
+                />
+                <p className="text-xs text-gray-400 mt-1">식빵 20장, 달걀 30개 등</p>
               </Field>
             </div>
+            <Field label="가성비 점수">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setForm({ ...form, value_score: n })}
+                    className={`text-2xl transition-all duration-150 ${n <= form.value_score ? 'text-yellow-400 scale-110 drop-shadow-sm' : 'text-gray-200'}`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              {(() => {
+                const price = Number(form.price_approx.replace(/[^0-9]/g, ''))
+                const grams = Number(form.volume.replace(/[^0-9]/g, ''))
+                if (!price || !grams) return null
+                const per100g = Math.round((price / grams) * 100)
+                return (
+                  <p className="text-xs text-gray-400 mt-1">
+                    {per100g.toLocaleString('ko-KR')}원/100g
+                  </p>
+                )
+              })()}
+            </Field>
 
             <div className="grid grid-cols-2 gap-4">
               <Field label="카테고리">

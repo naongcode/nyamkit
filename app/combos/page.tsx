@@ -16,7 +16,7 @@ async function getCombos(): Promise<HoneyCombo[]> {
 }
 
 async function getSnacks(): Promise<SnackSummary[]> {
-  const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url')
+  const { data } = await supabase.from('snacks').select('id, name, image_url, price_approx, purchase_url, volume, pkg_count')
   return (data || []) as SnackSummary[]
 }
 

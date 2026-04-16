@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HoneyCombo, SnackSummary, ComboItem } from '@/types/snack'
 import { createSupabaseBrowser } from '@/lib/supabase'
+import { calcItemCost } from '@/lib/calcItemCost'
 
 interface Props {
   combo: HoneyCombo
@@ -109,6 +110,7 @@ export default function ComboDetailClient({ combo, snacks, userId }: Props) {
 
       {/* 구성 목록 */}
       <section>
+        <ComboSummaryBar items={combo.items} snackMap={snackMap} />
         <h3 className="text-base font-bold mb-3">구성 ({combo.items.length}가지)</h3>
         <div className="space-y-3">
           {combo.items.map((item, i) => (
@@ -117,6 +119,40 @@ export default function ComboDetailClient({ combo, snacks, userId }: Props) {
         </div>
       </section>
     </main>
+  )
+}
+
+function ComboSummaryBar({ items, snackMap }: { items: ComboItem[]; snackMap: Record<string, SnackSummary> }) {
+  let purchaseTotal = 0
+  let purchaseCounted = 0
+  let usageCost = 0
+  let usageCounted = 0
+
+  for (const item of items) {
+    const snack = item.type === 'existing' && item.snack_id ? snackMap[item.snack_id] : undefined
+    const priceStr = snack?.price_approx || item.price
+    const priceNum = priceStr ? Number(priceStr.replace(/[^0-9]/g, '')) : 0
+    if (priceNum > 0) { purchaseTotal += priceNum; purchaseCounted++ }
+
+    const cost = calcItemCost(priceStr, snack?.volume, snack?.pkg_count, item.use_amount)
+    if (cost !== null) { usageCost += cost; usageCounted++ }
+  }
+
+  if (purchaseTotal === 0) return null
+
+  return (
+    <div className="bg-gray-50 rounded-2xl px-4 py-3 mb-4 flex items-center justify-between gap-4">
+      <div>
+        <p className="text-xs text-gray-400 mb-0.5">구입 합계{purchaseCounted < items.length ? ` (${purchaseCounted}종)` : ''}</p>
+        <p className="text-base font-bold text-gray-700">약 {purchaseTotal.toLocaleString('ko-KR')}원</p>
+      </div>
+      {usageCounted > 0 && (
+        <div className="text-right">
+          <p className="text-xs text-gray-400 mb-0.5">실사용 원가{usageCounted < items.length ? ` (${usageCounted}종)` : ''}</p>
+          <p className="text-base font-bold text-orange-500">약 {usageCost.toLocaleString('ko-KR')}원</p>
+        </div>
+      )}
+    </div>
   )
 }
 

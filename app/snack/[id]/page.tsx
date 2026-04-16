@@ -42,7 +42,7 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
         {/* 이미지 */}
         <div className="relative shrink-0 w-52 h-52 rounded-2xl overflow-hidden bg-gray-100 shadow-sm mx-auto sm:mx-0">
           {snack.image_url ? (
-            <Image src={snack.image_url} alt={snack.name} fill className="object-contain" sizes="208px" />
+            <Image src={snack.image_url} alt={snack.name} fill className="object-contain" sizes="208px" priority loading="eager" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-5xl">🍱</div>
           )}
