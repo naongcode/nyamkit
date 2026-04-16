@@ -27,7 +27,13 @@ export function calcItemCost(
   }
 
   // "20g" / "50ml" / "0.5kg" / "1l" 형식 → 무게·용량 기반
-  const weightMatch = ua.match(/^(\d+\.?\d*)\s*(g|ml|kg|l|cc)$/i)
+  // 단위 없이 숫자만 입력된 경우 volume에서 단위 추론
+  let weightInput = ua
+  if (/^\d+\.?\d*$/.test(ua) && volume) {
+    const inferredUnit = volume.match(/\d+\.?\d*\s*(g|ml|kg|l|cc)/i)?.[1]
+    if (inferredUnit) weightInput = ua + inferredUnit
+  }
+  const weightMatch = weightInput.match(/^(\d+\.?\d*)\s*(g|ml|kg|l|cc)$/i)
   if (weightMatch && volume) {
     const useNum = parseFloat(weightMatch[1])
     const useUnit = weightMatch[2].toLowerCase()
