@@ -61,7 +61,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default async function Home() {
   const [snacks, ranking, combos] = await Promise.all([getSnacks(), getWeeklyRanking(), getRecentCombos()])
-  const picks = shuffle(snacks.filter((s) => s.tags.includes('주인장픽'))).slice(0, 3)
+  const picks = shuffle(snacks.filter((s) => s.tags.includes('냠킷PICK'))).slice(0, 3)
 
   // 상품이 있는 카테고리 중 랜덤 1개
   const categories = ['냉동식품', '과자', '라면·면·즉석', '음료', '편의점', '야채', '소스·양념·재료', '기타'] as const
@@ -105,7 +105,7 @@ export default async function Home() {
       {/* 주인장 픽 */}
       {picks.length > 0 && (
         <section className="mb-8 -mx-4 px-4 py-5 bg-orange-100 rounded-2xl">
-          <h2 className="text-base font-bold mb-3">👑 주인장 픽</h2>
+          <h2 className="text-base font-bold mb-3">✨ 냠킷 PICK</h2>
           <div className="grid grid-cols-3 gap-3">
             {picks.map((s) => <SnackCard key={s.id} snack={s} />)}
           </div>

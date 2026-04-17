@@ -18,7 +18,7 @@ function calcValueScore(priceApprox: string, volume: string): number | null {
 
 const CATEGORIES: Category[] = ['냉동식품', '과자', '라면·면·즉석', '음료', '편의점', '야채', '소스·양념·재료', '기타']
 const PREP_TYPES: PrepType[] = ['그냥먹기', '전자레인지', '에어프라이어', '끓이기', '전기밥솥']
-const ALL_TAGS: Tag[] = ['주인장픽', '신상', '혼밥', '야식', '든든함', '간단함']
+const ALL_TAGS: Tag[] = ['냠킷PICK', '신상', '혼밥', '야식', '든든함', '간단함']
 
 const emptyForm = {
   name: '',

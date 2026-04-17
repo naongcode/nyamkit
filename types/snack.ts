@@ -2,7 +2,7 @@ export type PrepType = '그냥먹기' | '전자레인지' | '에어프라이어'
 
 export type Category = '냉동식품' | '과자' | '라면·면·즉석' | '음료' | '편의점' | '야채' | '소스·양념·재료' | '기타'
 
-export type Tag = '주인장픽' | '신상' | '혼밥' | '야식' | '든든함' | '간단함'
+export type Tag = '냠킷PICK' | '신상' | '혼밥' | '야식' | '든든함' | '간단함'
 
 export interface SnackPrep {
   steps: string[]
