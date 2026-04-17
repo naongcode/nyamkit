@@ -61,7 +61,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default async function Home() {
   const [snacks, ranking, combos] = await Promise.all([getSnacks(), getWeeklyRanking(), getRecentCombos()])
-  const picks = shuffle(snacks.filter((s) => s.tags.includes('냠킷PICK'))).slice(0, 3)
+  const picks = shuffle(snacks.filter((s) => s.tags.includes('주인장픽'))).slice(0, 3)
 
   // 상품이 있는 카테고리 중 랜덤 1개
   const categories = ['냉동식품', '과자', '라면·면·즉석', '음료', '편의점', '야채', '소스·양념·재료', '기타'] as const

@@ -20,7 +20,7 @@ export default function SnackCard({ snack }: { snack: Snack }) {
           ) : (
             <div className="w-full h-full flex items-center justify-center text-4xl">🍱</div>
           )}
-          {snack.tags.includes('냠킷PICK') ? (
+          {snack.tags.includes('주인장픽') ? (
             <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-medium z-10">
               냠킷 PICK
             </span>
