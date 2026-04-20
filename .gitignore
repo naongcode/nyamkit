@@ -45,3 +45,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 supabase/.temp/
+
+# toss
+/app/api/auth/toss/
+/lib/toss-env.ts
+/public/toss_upload/
+/supabase/migrations/20260417000000_toss_users.sql
+toss.md
