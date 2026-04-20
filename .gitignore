@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+*.crt
+*.key
+
+# mTLS 인증서
+/mTLS/
 
 # debug
 npm-debug.log*

@@ -37,6 +37,11 @@ export default async function SnackPage({ params }: { params: Promise<{ id: stri
         <a href="/" className="text-sm text-orange-500 border border-orange-300 px-3 py-1.5 rounded-full">홈으로</a>
       </div>
 
+      {/* 쿠팡 파트너스 고지 */}
+      <p className="px-4 pb-2 text-xs text-gray-400 leading-relaxed">
+        이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+      </p>
+
       {/* 이미지 + 기본 정보 */}
       <div className="px-4 flex flex-col sm:flex-row gap-4">
         {/* 이미지 */}
